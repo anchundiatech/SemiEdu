@@ -1,0 +1,338 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  BookOpen, 
+  Users, 
+  Calendar, 
+  Clock,
+  Plus,
+  Search,
+  Filter,
+  MoreVertical,
+  ExternalLink,
+  User,
+  GraduationCap
+} from 'lucide-react';
+
+export default function ClassesPage() {
+  const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+
+  // Mock data para las clases
+  const mockClasses = [
+    {
+      id: '1',
+      name: 'Matemáticas Avanzadas',
+      code: 'MAT-401',
+      teacher: 'Prof. Elena López',
+      students: 28,
+      schedule: 'Lun, Mié, Vie 10:00-11:30',
+      room: 'Aula 205',
+      status: 'active',
+      description: 'Cálculo diferencial e integral aplicado',
+      nextClass: '2024-01-26T10:00:00',
+      progress: 75
+    },
+    {
+      id: '2',
+      name: 'Historia Universal',
+      code: 'HIS-301',
+      teacher: 'Prof. Roberto Sánchez',
+      students: 25,
+      schedule: 'Mar, Jue 14:00-15:30',
+      room: 'Aula 103',
+      status: 'active',
+      description: 'Historia moderna y contemporánea',
+      nextClass: '2024-01-25T14:00:00',
+      progress: 60
+    },
+    {
+      id: '3',
+      name: 'Química Orgánica',
+      code: 'QUI-402',
+      teacher: 'Prof. Laura Fernández',
+      students: 22,
+      schedule: 'Lun, Mié 16:00-17:30',
+      room: 'Lab. Química',
+      status: 'active',
+      description: 'Compuestos orgánicos y reacciones',
+      nextClass: '2024-01-26T16:00:00',
+      progress: 45
+    },
+    {
+      id: '4',
+      name: 'Literatura Española',
+      code: 'LIT-201',
+      teacher: 'Prof. Ana Torres',
+      students: 30,
+      schedule: 'Mar, Vie 09:00-10:30',
+      room: 'Aula 301',
+      status: 'completed',
+      description: 'Literatura del Siglo de Oro',
+      nextClass: null,
+      progress: 100
+    }
+  ];
+
+  const userRole = user?.user_metadata?.rol;
+
+  const filteredClasses = mockClasses.filter(cls => {
+    const matchesSearch = cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         cls.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         cls.teacher.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = filterStatus === 'all' || cls.status === filterStatus;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const getStatusBadge = (status: string) => {
+    const styles = {
+      active: 'bg-green-100 text-green-800',
+      completed: 'bg-blue-100 text-blue-800',
+      pending: 'bg-yellow-100 text-yellow-800'
+    };
+    
+    const labels = {
+      active: 'Activa',
+      completed: 'Completada',
+      pending: 'Pendiente'
+    };
+
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status as keyof typeof styles]}`}>
+        {labels[status as keyof typeof labels]}
+      </span>
+    );
+  };
+
+  const formatNextClass = (dateString: string | null) => {
+    if (!dateString) return 'Curso finalizado';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffHours = Math.abs(date.getTime() - now.getTime()) / (1000 * 60 * 60);
+    
+    if (diffHours < 24) {
+      return `Hoy ${date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+    } else if (diffHours < 48) {
+      return `Mañana ${date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+    } else {
+      return date.toLocaleDateString('es-ES', { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+  };
+
+  return (
+    <div className="p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {userRole === 'docente' ? 'Mis Clases' : 'Clases'}
+              </h1>
+              <p className="text-gray-600 mt-1">
+                {userRole === 'docente' 
+                  ? 'Gestiona tus clases y estudiantes' 
+                  : 'Explora tus clases inscritas'
+                }
+              </p>
+            </div>
+            {userRole === 'docente' && (
+              <Button className="flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Nueva Clase
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Filtros y búsqueda */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Buscar clases, códigos o profesores..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+            >
+              <option value="all">Todas las clases</option>
+              <option value="active">Activas</option>
+              <option value="completed">Completadas</option>
+              <option value="pending">Pendientes</option>
+            </select>
+            <Button variant="outline" size="sm">
+              <Filter className="w-4 h-4 mr-2" />
+              Filtros
+            </Button>
+          </div>
+        </div>
+
+        {/* Estadísticas rápidas */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Clases</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{mockClasses.length}</p>
+              </div>
+              <div className="p-3 rounded-full bg-blue-100">
+                <BookOpen className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Clases Activas</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {mockClasses.filter(c => c.status === 'active').length}
+                </p>
+              </div>
+              <div className="p-3 rounded-full bg-green-100">
+                <GraduationCap className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  {userRole === 'docente' ? 'Total Estudiantes' : 'Compañeros'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {mockClasses.reduce((sum, c) => sum + c.students, 0)}
+                </p>
+              </div>
+              <div className="p-3 rounded-full bg-purple-100">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Progreso Promedio</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {Math.round(mockClasses.reduce((sum, c) => sum + c.progress, 0) / mockClasses.length)}%
+                </p>
+              </div>
+              <div className="p-3 rounded-full bg-yellow-100">
+                <Clock className="w-6 h-6 text-yellow-600" />
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Lista de clases */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {filteredClasses.map((cls) => (
+            <Card key={cls.id} className="p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900">{cls.name}</h3>
+                    {getStatusBadge(cls.status)}
+                  </div>
+                  <p className="text-sm text-gray-600 mb-1">Código: {cls.code}</p>
+                  <p className="text-sm text-gray-600">{cls.description}</p>
+                </div>
+                <Button variant="ghost" size="sm">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <User className="w-4 h-4" />
+                  <span>{cls.teacher}</span>
+                </div>
+                
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Users className="w-4 h-4" />
+                  <span>{cls.students} estudiantes</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="w-4 h-4" />
+                  <span>{cls.schedule}</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Clock className="w-4 h-4" />
+                  <span>Próxima clase: {formatNextClass(cls.nextClass)}</span>
+                </div>
+
+                {cls.status === 'active' && (
+                  <div>
+                    <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+                      <span>Progreso del curso</span>
+                      <span>{cls.progress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-primary h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${cls.progress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-2 mt-6">
+                <Button variant="primary" size="sm" className="flex-1">
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Ver Detalles
+                </Button>
+                {userRole === 'docente' && (
+                  <Button variant="outline" size="sm">
+                    Gestionar
+                  </Button>
+                )}
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {filteredClasses.length === 0 && (
+          <div className="text-center py-12">
+            <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron clases</h3>
+            <p className="text-gray-600">
+              {searchTerm 
+                ? 'Intenta con otros términos de búsqueda' 
+                : 'Aún no tienes clases asignadas'
+              }
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
