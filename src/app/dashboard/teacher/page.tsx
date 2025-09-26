@@ -19,12 +19,14 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { mockCourses, getProgressData } from '@/utils/mockData';
 import { useAuth } from '@/contexts/AuthContext';
+import { useGoogleClassroomData } from '@/hooks/useGoogleClassroomData';
 
 export default function TeacherDashboardPage() {
   const [selectedTeacher, setSelectedTeacher] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<string>('6months');
   const { user, setUserFromCallback } = useAuth();
   const searchParams = useSearchParams();
+  const classroomData = useGoogleClassroomData();
 
   // Procesar datos del usuario desde la URL (callback de OAuth)
   useEffect(() => {
@@ -363,6 +365,105 @@ export default function TeacherDashboardPage() {
             </table>
           </div>
         </Card>
+
+        {/* Sección de Cursos y Tareas Reales */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Mis Cursos */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
+                Mis Cursos
+              </h3>
+              <span className="text-sm text-gray-500">
+                {user?.user_metadata?.google_classroom?.connected ? 'Conectado a Google Classroom' : 'Datos de prueba'}
+              </span>
+            </div>
+            
+            <div className="space-y-3">
+              {classroomData.courses.length > 0 ? (
+                classroomData.courses.map((course, index) => (
+                  <div key={course.id || index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900">{course.name}</h4>
+                        {course.section && (
+                          <p className="text-sm text-gray-600 mt-1">{course.section}</p>
+                        )}
+                        {course.room && (
+                          <p className="text-xs text-gray-500 mt-1">📍 {course.room}</p>
+                        )}
+                        {course.enrollmentCode && (
+                          <p className="text-xs text-blue-600 mt-1">Código: {course.enrollmentCode}</p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                          Activo
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <BookOpen className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p>No hay cursos disponibles</p>
+                  <p className="text-sm">Conecta tu cuenta de Google Classroom</p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Tareas Pendientes */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <Clock className="w-5 h-5 mr-2 text-orange-600" />
+                Tareas Pendientes
+              </h3>
+              <span className="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                {classroomData.pendingAssignments}
+              </span>
+            </div>
+            
+            <div className="space-y-3">
+              {classroomData.assignments.length > 0 ? (
+                classroomData.assignments
+                  .filter(assignment => assignment.state === 'PUBLISHED')
+                  .map((assignment, index) => (
+                    <div key={assignment.id || index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900">{assignment.title}</h4>
+                          <p className="text-sm text-gray-600 mt-1">{assignment.courseName || 'Curso no especificado'}</p>
+                          {assignment.description && (
+                            <p className="text-xs text-gray-500 mt-1 line-clamp-2">{assignment.description}</p>
+                          )}
+                          {assignment.dueDate && (
+                            <p className="text-xs text-red-600 mt-2">
+                              📅 Vence: {assignment.dueDate.day}/{assignment.dueDate.month}/{assignment.dueDate.year}
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          {assignment.maxPoints && (
+                            <span className="text-xs text-gray-500">{assignment.maxPoints} pts</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p>No hay tareas pendientes</p>
+                  <p className="text-sm">¡Excelente trabajo!</p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
       </main>
     </div>
   );

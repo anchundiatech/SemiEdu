@@ -62,7 +62,7 @@ export default function DashboardPage() {
                 data: {
                   ...user.user_metadata,
                   rol: detectedRole,
-                  nombre: user.user_metadata?.full_name || user.user_metadata?.name || 'Usuario',
+                  nombre: user.user_metadata?.nombre || user.email?.split('@')[0] || 'Usuario',
                   role_detection: {
                     method: 'email_fallback',
                     detected_at: new Date().toISOString()

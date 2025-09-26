@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { 
+import {
   ExternalLink,
   RefreshCw,
   CheckCircle,
@@ -53,20 +53,20 @@ export default function GoogleClassroomIntegration() {
   const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   const searchParams = useSearchParams();
 
   useEffect(() => {
     checkIntegrationStatus();
-    
+
     // Manejar parámetros de URL (callback de Google)
     const urlError = searchParams.get('error');
     const urlSuccess = searchParams.get('success');
-    
+
     if (urlError) {
       setError(getErrorMessage(urlError));
     }
-    
+
     if (urlSuccess) {
       setSuccess('¡Integración con Google Classroom configurada exitosamente!');
       checkIntegrationStatus();
@@ -94,20 +94,20 @@ export default function GoogleClassroomIntegration() {
     try {
       setLoading(true);
       console.log('🔄 Cliente - Verificando estado de integración...');
-      
+
       const response = await fetch('/api/google/status');
       console.log('📡 Cliente - Respuesta del servidor:', response.status);
-      
+
       // Si el servicio está desactivado (503), no es un error crítico
       if (response.status === 503) {
         console.log('Servicio de Google temporalmente desactivado');
         setStatus({ connected: false });
         return;
       }
-      
+
       const data = await response.json();
       console.log('📦 Cliente - Datos recibidos:', data);
-      
+
       if (data.success) {
         console.log('✅ Cliente - Estableciendo estado:', data.status);
         setStatus(data.status);
@@ -128,15 +128,15 @@ export default function GoogleClassroomIntegration() {
     try {
       setError('');
       const response = await fetch('/api/google/auth/generate');
-      
+
       // Si el servicio está desactivado (503), mostrar mensaje
       if (response.status === 503) {
         setError('Integración con Google temporalmente desactivada');
         return;
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         window.location.href = data.authUrl;
       } else {
@@ -152,13 +152,13 @@ export default function GoogleClassroomIntegration() {
       setSyncing(true);
       setError('');
       setSyncResult(null);
-      
+
       const response = await fetch('/api/google/sync', {
         method: 'POST'
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setSyncResult(data.results);
         setSuccess('Sincronización completada exitosamente');
@@ -182,9 +182,9 @@ export default function GoogleClassroomIntegration() {
       const response = await fetch('/api/google/disconnect', {
         method: 'POST'
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setStatus({ connected: false });
         setSuccess('Integración desconectada exitosamente');
@@ -216,8 +216,8 @@ export default function GoogleClassroomIntegration() {
             <div>
               <h1 className="text-3xl font-bold mb-2">Google Classroom</h1>
               <p className="text-blue-100 text-lg">
-                {status.userRole === 'coordinador' ? 'Panel de Administración' : 
-                 status.userRole === 'docente' ? 'Panel de Profesor' : 
+                {status.userRole === 'coordinador' ? 'Panel de Administración' :
+                 status.userRole === 'docente' ? 'Panel de Profesor' :
                  'Capa de reportería inteligente'}
               </p>
               {status.userName && (
@@ -242,13 +242,13 @@ export default function GoogleClassroomIntegration() {
             </div>
           </div>
         </div>
-        
+
         {/* Estado y acciones */}
         <div className="flex items-center justify-between mt-6 pt-6 border-t border-white/20">
           <div className="flex items-center space-x-3">
             <div className={`flex items-center px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm ${
-              status.connected 
-                ? 'bg-green-500/20 text-green-100 border border-green-400/30' 
+              status.connected
+                ? 'bg-green-500/20 text-green-100 border border-green-400/30'
                 : 'bg-red-500/20 text-red-100 border border-red-400/30'
             }`}>
               {status.connected ? (
@@ -268,22 +268,22 @@ export default function GoogleClassroomIntegration() {
                 <Clock className="w-4 h-4 inline mr-1" />
                 Última sync: {new Date(status.lastSync).toLocaleString('es-ES', {
                   day: '2-digit',
-                  month: '2-digit', 
+                  month: '2-digit',
                   hour: '2-digit',
                   minute: '2-digit'
                 })}
               </div>
             )}
           </div>
-          
+
           <div className="flex items-center space-x-3">
             {/* Solo coordinadores pueden gestionar la integración */}
             {status.userRole === 'coordinador' ? (
               status.connected ? (
                 <>
-                  <Button 
-                    variant="secondary" 
-                    onClick={handleSync} 
+                  <Button
+                    variant="secondary"
+                    onClick={handleSync}
                     disabled={syncing}
                     className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
                   >
@@ -294,8 +294,8 @@ export default function GoogleClassroomIntegration() {
                     )}
                     {syncing ? 'Sincronizando...' : 'Sincronizar'}
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={handleDisconnect}
                     className="bg-red-500/20 hover:bg-red-500/30 text-white border-red-400/30 backdrop-blur-sm"
                   >
@@ -304,8 +304,8 @@ export default function GoogleClassroomIntegration() {
                   </Button>
                 </>
               ) : (
-                <Button 
-                  variant="secondary" 
+                <Button
+                  variant="secondary"
                   onClick={handleConnect}
                   className="bg-white text-blue-600 hover:bg-blue-50 font-semibold px-6 py-3"
                 >
@@ -414,26 +414,82 @@ export default function GoogleClassroomIntegration() {
           </div>
         </>
       ) : (
-        /* Estado desconectado mejorado */
-        <Card className="p-12 text-center">
-          <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <ExternalLink className="w-12 h-12 text-gray-400" />
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">
-            Conecta tu Google Classroom
-          </h3>
-          <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            Importa automáticamente tus cursos, estudiantes y tareas para tener una vista completa de tu aula digital.
-          </p>
-          <Button 
-            variant="primary" 
-            onClick={handleConnect}
-            className="px-8 py-3 text-lg"
-          >
-            <LinkIcon className="w-5 h-5 mr-2" />
-            Conectar Google Classroom
-          </Button>
-        </Card>
+        <>
+          {/* Estado desconectado mejorado */}
+          <Card className="p-12 text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <ExternalLink className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              Conecta tu Google Classroom
+            </h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              Importa automáticamente tus cursos, estudiantes y tareas para tener una vista completa de tu aula digital.
+            </p>
+            <Button
+              variant="primary"
+              onClick={handleConnect}
+              className="px-8 py-3 text-lg"
+            >
+              <LinkIcon className="w-5 h-5 mr-2" />
+              Conectar Google Classroom
+            </Button>
+          </Card>
+
+          {/* Panel de configuración de variables de entorno */}
+          <Card className="p-6 bg-yellow-50 border-yellow-200">
+            <div className="flex items-start">
+              <Settings className="w-6 h-6 text-yellow-600 mr-3 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+                  Configuración Requerida
+                </h3>
+                <p className="text-yellow-700 mb-4">
+                  Para conectar con Google Classroom, necesitas configurar las siguientes variables de entorno:
+                </p>
+
+                <div className="bg-white p-4 rounded-lg border border-yellow-200 mb-4">
+                  <h4 className="font-medium text-gray-900 mb-2">Variables de entorno necesarias:</h4>
+                  <div className="space-y-2 text-sm font-mono">
+                    <div className="flex items-center">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span className="text-gray-700">GOOGLE_CLIENT_ID</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span className="text-gray-700">GOOGLE_CLIENT_SECRET</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span className="text-gray-700">NEXT_PUBLIC_SUPABASE_URL</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span className="text-gray-700">NEXT_PUBLIC_SUPABASE_ANON_KEY</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <h4 className="font-medium text-blue-900 mb-2">Pasos para configurar:</h4>
+                  <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                    <li>Crear un proyecto en Google Cloud Console</li>
+                    <li>Habilitar la API de Google Classroom</li>
+                    <li>Crear credenciales OAuth 2.0</li>
+                    <li>Configurar las URLs de redirección</li>
+                    <li>Agregar las variables al archivo .env.local</li>
+                  </ol>
+                </div>
+
+                <div className="mt-4 p-3 bg-gray-100 rounded-lg">
+                  <p className="text-sm text-gray-600">
+                    <strong>Nota:</strong> Una vez configuradas las variables de entorno, reinicia el servidor de desarrollo para que los cambios surtan efecto.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </>
       )}
 
       {/* Resultado de sincronización */}
@@ -442,18 +498,18 @@ export default function GoogleClassroomIntegration() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Resultado de la Sincronización
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-blue-900">{syncResult.courses}</div>
               <div className="text-sm text-blue-700">Clases sincronizadas</div>
             </div>
-            
+
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-green-900">{syncResult.students}</div>
               <div className="text-sm text-green-700">Estudiantes sincronizados</div>
             </div>
-            
+
             <div className="bg-yellow-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-yellow-900">{syncResult.assignments}</div>
               <div className="text-sm text-yellow-700">Tareas sincronizadas</div>
@@ -485,8 +541,8 @@ export default function GoogleClassroomIntegration() {
               <Zap className="w-5 h-5 text-blue-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
-              {status.userRole === 'coordinador' ? 'Gestión Completa' : 
-               status.userRole === 'docente' ? 'Vista de Profesor' : 
+              {status.userRole === 'coordinador' ? 'Gestión Completa' :
+               status.userRole === 'docente' ? 'Vista de Profesor' :
                'Vista de Estudiante'}
             </h3>
           </div>
@@ -578,7 +634,7 @@ export default function GoogleClassroomIntegration() {
               Última actualización: {status.lastSync ? new Date(status.lastSync).toLocaleString('es-ES') : 'Nunca'}
             </div>
           </div>
-          
+
           <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-xl border border-green-200">
             <div className="flex items-center">
               <CheckCircle className="w-6 h-6 text-green-600 mr-3" />

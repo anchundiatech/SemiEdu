@@ -21,7 +21,7 @@ export default function StudentDashboardPage() {
         const userData = JSON.parse(decodeURIComponent(userDataParam));
         console.log('📥 StudentDashboard - Procesando datos del callback:', userData);
         setUserFromCallback(userData);
-        
+
         // Limpiar la URL
         window.history.replaceState({}, '', '/dashboard/student');
       } catch (error) {
@@ -33,6 +33,9 @@ export default function StudentDashboardPage() {
   console.log('🎯 StudentDashboard - PÁGINA CARGADA');
   console.log('🎯 StudentDashboard - Usuario:', user?.email, 'Cargando:', loading);
   console.log('🎯 StudentDashboard - Datos de Classroom:', classroomData);
+  console.log('🎯 StudentDashboard - Error:', classroomData.error);
+  console.log('🎯 StudentDashboard - Loading:', classroomData.loading);
+  console.log('🎯 StudentDashboard - Cursos:', classroomData.courses);
   console.log('🎯 StudentDashboard - Timestamp:', new Date().toISOString());
 
   const handleSignOut = async () => {
@@ -51,7 +54,7 @@ export default function StudentDashboardPage() {
             document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
           }
         });
-        
+
         // Redirigir al login
         window.location.href = '/auth/login';
       }
@@ -76,14 +79,14 @@ export default function StudentDashboardPage() {
     setTimeout(() => {
       window.location.href = '/';
     }, 2000);
-    
+
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <p className="text-gray-600">No hay usuario autenticado</p>
           <p className="text-sm text-gray-500 mt-2">Redirigiendo a la página principal en 2 segundos...</p>
-          <Button 
+          <Button
             onClick={() => window.location.href = '/'}
             className="mt-4"
           >
@@ -104,7 +107,7 @@ export default function StudentDashboardPage() {
           <p className="text-sm text-gray-500 mt-2">
             Esta página es solo para estudiantes. Tu rol: {user.user_metadata?.rol || 'No definido'}
           </p>
-          <Button 
+          <Button
             onClick={() => window.location.href = '/dashboard'}
             className="mt-4"
           >
@@ -124,9 +127,9 @@ export default function StudentDashboardPage() {
             <p className="text-sm text-blue-800">
               <strong>Debug:</strong> Usuario: {user?.email} | Rol: {user?.user_metadata?.rol} | Nombre: {user?.user_metadata?.nombre}
             </p>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleSignOut}
               className="text-red-600 border-red-200 hover:bg-red-50"
             >
@@ -203,28 +206,63 @@ export default function StudentDashboardPage() {
 
         {/* Información de Fuente de Datos */}
         {classroomData.error && (
-          <Card className="p-4 mb-6 bg-blue-50 border-blue-200">
+          <Card className={`p-4 mb-6 ${
+            classroomData.error === 'CONFIGURATION_REQUIRED'
+              ? 'bg-yellow-50 border-yellow-200'
+              : 'bg-blue-50 border-blue-200'
+          }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <BookOpen className="w-5 h-5 text-blue-600 mr-2" />
+                <BookOpen className={`w-5 h-5 mr-2 ${
+                  classroomData.error === 'CONFIGURATION_REQUIRED'
+                    ? 'text-yellow-600'
+                    : 'text-blue-600'
+                }`} />
                 <div>
-                  <p className="text-sm font-medium text-blue-800">Conectar Google Classroom</p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    Para ver tus cursos y tareas reales, conecta tu cuenta de Google Classroom.
+                  <p className={`text-sm font-medium ${
+                    classroomData.error === 'CONFIGURATION_REQUIRED'
+                      ? 'text-yellow-800'
+                      : 'text-blue-800'
+                  }`}>
+                    {classroomData.error === 'CONFIGURATION_REQUIRED'
+                      ? 'Configuración Requerida'
+                      : 'Conectar Google Classroom'
+                    }
+                  </p>
+                  <p className={`text-xs mt-1 ${
+                    classroomData.error === 'CONFIGURATION_REQUIRED'
+                      ? 'text-yellow-600'
+                      : 'text-blue-600'
+                  }`}>
+                    {classroomData.error === 'CONFIGURATION_REQUIRED'
+                      ? 'El administrador necesita configurar las credenciales de Google OAuth para conectar con Google Classroom.'
+                      : 'Para ver tus cursos y tareas reales, conecta tu cuenta de Google Classroom.'
+                    }
                   </p>
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button 
-                  onClick={() => {
-                    window.location.href = '/connect-classroom';
-                  }}
-                  className="text-sm bg-blue-600 hover:bg-blue-700"
-                >
-                  🔗 Conectar Google Classroom
-                </Button>
-                <Button 
-                  variant="outline" 
+                {classroomData.error === 'CONFIGURATION_REQUIRED' ? (
+                  <Button
+                    onClick={() => {
+                      window.location.href = '/admin/integration';
+                    }}
+                    className="text-sm bg-yellow-600 hover:bg-yellow-700"
+                  >
+                    ⚙️ Configurar
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      window.location.href = '/connect-classroom';
+                    }}
+                    className="text-sm bg-blue-600 hover:bg-blue-700"
+                  >
+                    🔗 Conectar Google Classroom
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => {
                     window.location.reload();
@@ -245,7 +283,7 @@ export default function StudentDashboardPage() {
               <h3 className="text-lg font-semibold text-gray-900">Mis Cursos</h3>
               <BookOpen className="w-5 h-5 text-blue-600" />
             </div>
-            
+
             {classroomData.loading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
@@ -288,7 +326,7 @@ export default function StudentDashboardPage() {
               <h3 className="text-lg font-semibold text-gray-900">Tareas Pendientes</h3>
               <Clock className="w-5 h-5 text-yellow-600" />
             </div>
-            
+
             {classroomData.loading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (

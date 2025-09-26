@@ -694,7 +694,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="mt-2">
                       <div className="flex flex-wrap gap-1">
-                        {teacher.courses.map((course, index) => (
+                        {teacher.courses.map((course: any, index: any) => (
                           <span 
                             key={index}
                             className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
