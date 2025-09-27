@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  BookOpen, 
-  Users, 
-  Calendar, 
+import { useSession } from 'next-auth/react';
+import {
+  BookOpen,
+  Users,
+  Calendar,
   Clock,
   Plus,
   Search,
@@ -17,77 +17,41 @@ import {
   User,
   GraduationCap
 } from 'lucide-react';
+import { useGoogleClassroomData } from '@/hooks/useGoogleClassroomData';
+import AuthGuard from '@/components/auth/AuthGuard';
+import ClassroomLoading from '@/components/ui/ClassroomLoading';
+import DashboardSidebar from '../dashboard/layout';
 
 export default function ClassesPage() {
-  const { user } = useAuth();
+  const { data: session } = useSession();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const classroomData = useGoogleClassroomData(); //Datos reales de la api de google classroom
+  const { loading, error } = classroomData;
 
-  // Mock data para las clases
-  const mockClasses = [
-    {
-      id: '1',
-      name: 'Matemáticas Avanzadas',
-      code: 'MAT-401',
-      teacher: 'Prof. Elena López',
-      students: 28,
-      schedule: 'Lun, Mié, Vie 10:00-11:30',
-      room: 'Aula 205',
-      status: 'active',
-      description: 'Cálculo diferencial e integral aplicado',
-      nextClass: '2024-01-26T10:00:00',
-      progress: 75
-    },
-    {
-      id: '2',
-      name: 'Historia Universal',
-      code: 'HIS-301',
-      teacher: 'Prof. Roberto Sánchez',
-      students: 25,
-      schedule: 'Mar, Jue 14:00-15:30',
-      room: 'Aula 103',
-      status: 'active',
-      description: 'Historia moderna y contemporánea',
-      nextClass: '2024-01-25T14:00:00',
-      progress: 60
-    },
-    {
-      id: '3',
-      name: 'Química Orgánica',
-      code: 'QUI-402',
-      teacher: 'Prof. Laura Fernández',
-      students: 22,
-      schedule: 'Lun, Mié 16:00-17:30',
-      room: 'Lab. Química',
-      status: 'active',
-      description: 'Compuestos orgánicos y reacciones',
-      nextClass: '2024-01-26T16:00:00',
-      progress: 45
-    },
-    {
-      id: '4',
-      name: 'Literatura Española',
-      code: 'LIT-201',
-      teacher: 'Prof. Ana Torres',
-      students: 30,
-      schedule: 'Mar, Vie 09:00-10:30',
-      room: 'Aula 301',
-      status: 'completed',
-      description: 'Literatura del Siglo de Oro',
-      nextClass: null,
-      progress: 100
-    }
-  ];
+  //Datos reales de la api de google classroom
+  const ClassData = classroomData.courses || [];
 
-  const userRole = user?.user_metadata?.rol;
 
-  const filteredClasses = mockClasses.filter(cls => {
-    const matchesSearch = cls.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cls.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cls.teacher.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = filterStatus === 'all' || cls.status === filterStatus;
-    
+  const userRole = session?.user?.role;
+
+  const filteredClasses = ClassData.filter((cls: any) => {
+    const matchesSearch = cls.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         cls.section?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         cls.teacherName?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Mapear el estado de Google Classroom a nuestros filtros
+    const getStatus = (courseState: string) => {
+      switch (courseState) {
+        case 'ACTIVE': return 'active';
+        case 'ARCHIVED': return 'completed';
+        case 'PROVISIONED': return 'pending';
+        default: return 'active';
+      }
+    };
+
+    const matchesFilter = filterStatus === 'all' || getStatus(cls.courseState || 'ACTIVE') === filterStatus;
+
     return matchesSearch && matchesFilter;
   });
 
@@ -97,7 +61,7 @@ export default function ClassesPage() {
       completed: 'bg-blue-100 text-blue-800',
       pending: 'bg-yellow-100 text-yellow-800'
     };
-    
+
     const labels = {
       active: 'Activa',
       completed: 'Completada',
@@ -113,19 +77,19 @@ export default function ClassesPage() {
 
   const formatNextClass = (dateString: string | null) => {
     if (!dateString) return 'Curso finalizado';
-    
+
     const date = new Date(dateString);
     const now = new Date();
     const diffHours = Math.abs(date.getTime() - now.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffHours < 24) {
       return `Hoy ${date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
     } else if (diffHours < 48) {
       return `Mañana ${date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
     } else {
-      return date.toLocaleDateString('es-ES', { 
-        weekday: 'short', 
-        month: 'short', 
+      return date.toLocaleDateString('es-ES', {
+        weekday: 'short',
+        month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
@@ -134,30 +98,32 @@ export default function ClassesPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {userRole === 'docente' ? 'Mis Clases' : 'Clases'}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                {userRole === 'docente' 
-                  ? 'Gestiona tus clases y estudiantes' 
-                  : 'Explora tus clases inscritas'
-                }
-              </p>
+    <AuthGuard>
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {userRole === 'docente' ? 'Mis Clases' : 'Clases'}
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  {userRole === 'docente'
+                    ? 'Gestiona tus clases y estudiantes'
+                    : 'Explora tus clases inscritas'
+                  }
+                </p>
+              </div>
+              {userRole === 'docente' && (
+                <Button className="flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  Nueva Clase
+                </Button>
+              )}
             </div>
-            {userRole === 'docente' && (
-              <Button className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
-                Nueva Clase
-              </Button>
-            )}
           </div>
-        </div>
+
 
         {/* Filtros y búsqueda */}
         <div className="mb-6 flex flex-col sm:flex-row gap-4">
@@ -197,7 +163,7 @@ export default function ClassesPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Clases</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{mockClasses.length}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{ClassData.length}</p>
               </div>
               <div className="p-3 rounded-full bg-blue-100">
                 <BookOpen className="w-6 h-6 text-blue-600" />
@@ -210,7 +176,7 @@ export default function ClassesPage() {
               <div>
                 <p className="text-sm font-medium text-gray-600">Clases Activas</p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">
-                  {mockClasses.filter(c => c.status === 'active').length}
+                  {ClassData.filter((c: any) => c.courseState === 'ACTIVE').length}
                 </p>
               </div>
               <div className="p-3 rounded-full bg-green-100">
@@ -223,10 +189,10 @@ export default function ClassesPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
-                  {userRole === 'docente' ? 'Total Estudiantes' : 'Compañeros'}
+                  {userRole === 'docente' ? 'Total Tareas' : 'Tareas Asignadas'}
                 </p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">
-                  {mockClasses.reduce((sum, c) => sum + c.students, 0)}
+                  {classroomData.assignments?.length || 0}
                 </p>
               </div>
               <div className="p-3 rounded-full bg-purple-100">
@@ -238,9 +204,9 @@ export default function ClassesPage() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Progreso Promedio</p>
+                <p className="text-sm font-medium text-gray-600">Tareas Completadas</p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">
-                  {Math.round(mockClasses.reduce((sum, c) => sum + c.progress, 0) / mockClasses.length)}%
+                  {classroomData.completedAssignments || 0}
                 </p>
               </div>
               <div className="p-3 rounded-full bg-yellow-100">
@@ -250,89 +216,141 @@ export default function ClassesPage() {
           </Card>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <ClassroomLoading
+            message="Cargando tus cursos de Google Classroom..."
+            showSteps={true}
+          />
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-12">
+            <BookOpen className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Error al cargar cursos</h3>
+            <p className="text-gray-600">{error}</p>
+          </div>
+        )}
+
         {/* Lista de clases */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredClasses.map((cls) => (
-            <Card key={cls.id} className="p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{cls.name}</h3>
-                    {getStatusBadge(cls.status)}
-                  </div>
-                  <p className="text-sm text-gray-600 mb-1">Código: {cls.code}</p>
-                  <p className="text-sm text-gray-600">{cls.description}</p>
-                </div>
-                <Button variant="ghost" size="sm">
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </div>
+        {!loading && !error && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredClasses.map((cls: any) => {
+              const getStatus = (courseState: string) => {
+                switch (courseState) {
+                  case 'ACTIVE': return 'active';
+                  case 'ARCHIVED': return 'completed';
+                  case 'PROVISIONED': return 'pending';
+                  default: return 'active';
+                }
+              };
 
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <User className="w-4 h-4" />
-                  <span>{cls.teacher}</span>
-                </div>
-                
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Users className="w-4 h-4" />
-                  <span>{cls.students} estudiantes</span>
-                </div>
+              const status = getStatus(cls.courseState || 'ACTIVE');
+              const courseAssignments = classroomData.assignments?.filter((assignment: any) => assignment.courseId === cls.id) || [];
+              const publishedAssignments = courseAssignments.filter((assignment: any) => assignment.state === 'PUBLISHED');
 
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Calendar className="w-4 h-4" />
-                  <span>{cls.schedule}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Clock className="w-4 h-4" />
-                  <span>Próxima clase: {formatNextClass(cls.nextClass)}</span>
-                </div>
-
-                {cls.status === 'active' && (
-                  <div>
-                    <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
-                      <span>Progreso del curso</span>
-                      <span>{cls.progress}%</span>
+              return (
+                <Card key={cls.id} className="p-6 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900">{cls.name}</h3>
+                        {getStatusBadge(status)}
+                      </div>
+                      {cls.section && (
+                        <p className="text-sm text-gray-600 mb-1">Sección: {cls.section}</p>
+                      )}
+                      {cls.descriptionHeading && (
+                        <p className="text-sm text-gray-600">{cls.descriptionHeading}</p>
+                      )}
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-primary h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${cls.progress}%` }}
-                      />
-                    </div>
+                    <Button variant="ghost" size="sm">
+                      <MoreVertical className="w-4 h-4" />
+                    </Button>
                   </div>
-                )}
-              </div>
 
-              <div className="flex gap-2 mt-6">
-                <Button variant="primary" size="sm" className="flex-1">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Ver Detalles
-                </Button>
-                {userRole === 'docente' && (
-                  <Button variant="outline" size="sm">
-                    Gestionar
-                  </Button>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
+                  <div className="space-y-3">
+                    {cls.teacherName && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <User className="w-4 h-4" />
+                        <span>{cls.teacherName}</span>
+                      </div>
+                    )}
 
-        {filteredClasses.length === 0 && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <BookOpen className="w-4 h-4" />
+                      <span>{publishedAssignments.length} tareas publicadas</span>
+                    </div>
+
+                    {cls.room && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Calendar className="w-4 h-4" />
+                        <span>Aula: {cls.room}</span>
+                      </div>
+                    )}
+
+                    {cls.enrollmentCode && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Clock className="w-4 h-4" />
+                        <span>Código: {cls.enrollmentCode}</span>
+                      </div>
+                    )}
+
+                    {status === 'active' && publishedAssignments.length > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+                          <span>Progreso del curso</span>
+                          <span>{Math.round((classroomData.completedAssignments || 0) / (classroomData.assignments?.length || 1) * 100)}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${Math.round((classroomData.completedAssignments || 0) / (classroomData.assignments?.length || 1) * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-2 mt-6">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => window.open(cls.alternateLink, '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Ver en Classroom
+                    </Button>
+                    {userRole === 'docente' && (
+                      <Button variant="outline" size="sm">
+                        Gestionar
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+
+        {!loading && !error && filteredClasses.length === 0 && (
           <div className="text-center py-12">
             <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron clases</h3>
             <p className="text-gray-600">
-              {searchTerm 
-                ? 'Intenta con otros términos de búsqueda' 
-                : 'Aún no tienes clases asignadas'
+              {searchTerm
+                ? 'Intenta con otros términos de búsqueda'
+                : ClassData.length === 0
+                  ? 'No tienes clases en Google Classroom'
+                  : 'No hay clases que coincidan con el filtro seleccionado'
               }
             </p>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }

@@ -32,9 +32,9 @@ export async function GET(request: Request) {
 
     const students = await getStudents(courseId);
 
-    return NextResponse.json({ 
+      return NextResponse.json({
       students,
-      total: students.length 
+      total: students.length
     });
   } catch (error: unknown) {
     console.error("/api/google-classroom/student-data error:", error);

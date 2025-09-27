@@ -35,8 +35,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Función para establecer usuario desde callback
   const setUserFromCallback = (userData: any) => {
-    console.log('🔄 AuthContext - Estableciendo usuario desde callback:', userData);
-    
+
     const customUser: CustomUser = {
       id: userData.userId,
       email: userData.email,
@@ -51,31 +50,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     setUser(customUser);
-    
+
     // Guardar en localStorage para persistencia
     if (typeof window !== 'undefined') {
       localStorage.setItem('semiedu_user', JSON.stringify(customUser));
     }
-    
-    console.log('✅ AuthContext - Usuario establecido:', customUser);
+
   };
 
   // Función para cerrar sesión
   const signOut = async (): Promise<void> => {
     try {
-      console.log('🔄 AuthContext - Cerrando sesión...');
-      
+
       setUser(null);
-      
+
       // Limpiar localStorage
       if (typeof window !== 'undefined') {
         localStorage.removeItem('semiedu_user');
       }
-      
+
       // Redirigir a login
       router.push('/auth/login');
-      
-      console.log('✅ AuthContext - Sesión cerrada');
+
     } catch (error) {
       console.error('❌ Error cerrando sesión:', error);
     }
@@ -90,7 +86,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           if (storedUser) {
             const userData = JSON.parse(storedUser);
             setUser(userData);
-            console.log('✅ AuthContext - Usuario cargado desde localStorage:', userData);
           }
         }
       } catch (error) {

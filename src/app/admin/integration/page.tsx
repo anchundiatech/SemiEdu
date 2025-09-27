@@ -93,10 +93,8 @@ export default function GoogleClassroomIntegration() {
   const checkIntegrationStatus = async () => {
     try {
       setLoading(true);
-      console.log('🔄 Cliente - Verificando estado de integración...');
 
       const response = await fetch('/api/google/status');
-      console.log('📡 Cliente - Respuesta del servidor:', response.status);
 
       // Si el servicio está desactivado (503), no es un error crítico
       if (response.status === 503) {
@@ -106,13 +104,10 @@ export default function GoogleClassroomIntegration() {
       }
 
       const data = await response.json();
-      console.log('📦 Cliente - Datos recibidos:', data);
 
       if (data.success) {
-        console.log('✅ Cliente - Estableciendo estado:', data.status);
         setStatus(data.status);
       } else {
-        console.log('❌ Cliente - Error en respuesta:', data.error);
         setStatus({ connected: false });
       }
     } catch (error) {

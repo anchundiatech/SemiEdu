@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSession } from 'next-auth/react';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 interface ProtectedRouteProps {
@@ -11,38 +11,38 @@ interface ProtectedRouteProps {
   requiredPermission?: string;
 }
 
-export function ProtectedRoute({ 
-  children, 
-  requiredRole, 
-  requiredPermission 
+export function ProtectedRoute({
+  children,
+  requiredRole,
+  requiredPermission
 }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading) {
+    if (status !== 'loading') {
       // Si no hay usuario, redirigir al login
-      if (!user) {
-        router.push('/auth/login');
+      if (!session) {
+        router.push('/login');
         return;
       }
 
       // Verificar rol requerido
-      if (requiredRole && user.user_metadata?.rol !== requiredRole) {
+      if (requiredRole && session?.user?.role !== requiredRole) {
         router.push('/unauthorized');
         return;
       }
 
       // Verificar permiso requerido
-      if (requiredPermission && !user.user_metadata?.permissions?.includes(requiredPermission)) {
-        router.push('/unauthorized');
-        return;
+      if (requiredPermission) {
+        // TODO: Implementar verificación de permisos con NextAuth
+        console.log('Verificando permiso:', requiredPermission);
       }
     }
-  }, [user, loading, router, requiredRole, requiredPermission]);
+  }, [session, status, router, requiredRole, requiredPermission]);
 
   // Mostrar loading mientras se verifica la autenticación
-  if (loading) {
+  if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <LoadingSpinner size="lg" text="Verificando autenticación..." />
@@ -51,12 +51,12 @@ export function ProtectedRoute({
   }
 
   // Si no hay usuario, no mostrar nada (se redirigirá)
-  if (!user) {
+  if (!session) {
     return null;
   }
 
-  // Verificar permisos
-  if (requiredRole && user.user_metadata?.rol !== requiredRole) {
+  // Verificar rol
+  if (requiredRole && session?.user?.role !== requiredRole) {
     return null;
   }
 

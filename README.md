@@ -38,6 +38,7 @@ SemiEdu es una innovadora aplicación web **stateless** que se conecta directame
 - **Roles de Google Classroom**: Por curso específico (teacher, student)
 - **Detección Automática**: Sin configuración manual requerida
 - **Permisos Granulares**: Acceso basado en rol y contexto
+
 ### 🔐 Autenticación Inteligente
 
 - **Google OAuth 2.0**: Autenticación segura con cuentas de Google
@@ -85,6 +86,7 @@ SemiEdu es una innovadora aplicación web **stateless** que se conecta directame
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
 ### Autenticación & APIs
+
 ### Autenticación & APIs
 
 [![NextAuth.js](https://img.shields.io/badge/NextAuth.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://next-auth.js.org/)
@@ -193,6 +195,7 @@ SemiEdu/
 - **Acceso a Google Classroom** (como profesor o estudiante)
 
 ### Configuración de Google OAuth
+
 ### Configuración de Google OAuth
 
 1. **Crear proyecto en Google Cloud Console**:
@@ -202,7 +205,7 @@ SemiEdu/
    - Crea un nuevo proyecto o selecciona uno existente
    - Habilita la **Google Classroom API**
 
-2. **Configurar OAuth 2.0**:
+1. **Configurar OAuth 2.0**:
 
    - Ve a "Credenciales" → "Crear credenciales" → "ID de cliente OAuth 2.0"
    - Tipo de aplicación: **Aplicación web**
@@ -210,12 +213,13 @@ SemiEdu/
      - `http://localhost:3000/api/auth/callback/google` (desarrollo)
      - `https://tu-dominio.com/api/auth/callback/google` (producción)
 
-3. **Configurar variables de entorno**:
+1. **Configurar variables de entorno**:
+
    - Ve a [Google Cloud Console](https://console.cloud.google.com/)
    - Crea un nuevo proyecto o selecciona uno existente
    - Habilita la **Google Classroom API**
 
-2. **Configurar OAuth 2.0**:
+1. **Configurar OAuth 2.0**:
 
    - Ve a "Credenciales" → "Crear credenciales" → "ID de cliente OAuth 2.0"
    - Tipo de aplicación: **Aplicación web**
@@ -223,7 +227,7 @@ SemiEdu/
      - `http://localhost:3000/api/auth/callback/google` (desarrollo)
      - `https://tu-dominio.com/api/auth/callback/google` (producción)
 
-3. **Configurar variables de entorno**:
+1. **Configurar variables de entorno**:
 
    ```bash
    # Copia el archivo de ejemplo
@@ -235,14 +239,20 @@ SemiEdu/
    GOOGLE_CLIENT_ID=tu-google-client-id
    GOOGLE_CLIENT_SECRET=tu-google-client-secret
    ```
+
    # Edita .env.local con tus credenciales:
+
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=tu-secret-key-aqui
    GOOGLE_CLIENT_ID=tu-google-client-id
    GOOGLE_CLIENT_SECRET=tu-google-client-secret
+
+   ```
+
    ```
 
 ### Instalación con Yarn
+
 ### Instalación con Yarn
 
 1. **Instalar Yarn globalmente** (si no lo tienes):
@@ -253,7 +263,7 @@ SemiEdu/
    npm install -g yarn
    ```
 
-2. **Instalar dependencias**:
+1. **Instalar dependencias**:
 
    ```bash
    cd "c:\Users\HP CORE I3\Desktop\SemiEdu"
@@ -261,16 +271,16 @@ SemiEdu/
    yarn install
    ```
 
-3. **Ejecutar en modo desarrollo**:
-3. **Ejecutar en modo desarrollo**:
+1. **Ejecutar en modo desarrollo**:
+1. **Ejecutar en modo desarrollo**:
 
    ```bash
    yarn dev
    yarn dev
    ```
 
-4. **Otros comandos útiles**:
-4. **Otros comandos útiles**:
+1. **Otros comandos útiles**:
+1. **Otros comandos útiles**:
    ```bash
    yarn build          # Construir para producción
    yarn start          # Iniciar servidor de producción
@@ -296,12 +306,13 @@ SemiEdu/
 [![Type Check](https://img.shields.io/badge/Type%20Check-yarn%20type--check-purple?style=flat-square)](https://www.typescriptlang.org/)
 
 5. **Abrir en el navegador**:
-5. **Abrir en el navegador**:
+6. **Abrir en el navegador**:
    ```
    http://localhost:3000
    ```
 
 ### Autenticación
+
 ### Autenticación
 
 La aplicación utiliza **Google OAuth 2.0** para autenticación:
@@ -332,10 +343,10 @@ La aplicación utiliza **Google OAuth 2.0** para autenticación:
 2. **Detección de Roles**: Automática basada en email y Google Classroom
 3. **Dashboard**: Acceso a cursos y funcionalidades según rol
 4. **Integración en Tiempo Real**: Datos sincronizados con Google Classroom
-1. **Autenticación**: Login con Google OAuth 2.0
-2. **Detección de Roles**: Automática basada en email y Google Classroom
-3. **Dashboard**: Acceso a cursos y funcionalidades según rol
-4. **Integración en Tiempo Real**: Datos sincronizados con Google Classroom
+5. **Autenticación**: Login con Google OAuth 2.0
+6. **Detección de Roles**: Automática basada en email y Google Classroom
+7. **Dashboard**: Acceso a cursos y funcionalidades según rol
+8. **Integración en Tiempo Real**: Datos sincronizados con Google Classroom
 
 ## 🎯 Usuarios Objetivo
 

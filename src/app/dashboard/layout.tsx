@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
+import { useSession, signOut } from 'next-auth/react';
+import AuthGuard from '@/components/auth/AuthGuard';
+import {
   LayoutDashboard,
   Users,
   BookOpen,
@@ -29,21 +30,24 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
+  const { data: session } = useSession();
+
+  // No mostrar sidebar en la página principal de dashboard (redirección)
+  const shouldShowSidebar = pathname !== '/dashboard';
 
   // Configuración de navegación según el rol
   const getNavigationItems = () => {
-    const userRole = user?.user_metadata?.rol;
-    
+    const userRole = session?.user?.role;
+
     const commonItems = [
       {
         name: 'Dashboard',
-        href: userRole === 'coordinador' ? '/admin' : 
-              userRole === 'docente' ? '/dashboard/teacher' : 
+        href: userRole === 'coordinador' ? '/admin' :
+              userRole === 'docente' ? '/dashboard/teacher' :
               '/dashboard/student',
         icon: LayoutDashboard,
-        current: pathname === '/dashboard' || 
-                pathname === '/dashboard/student' || 
+        current: pathname === '/dashboard' ||
+                pathname === '/dashboard/student' ||
                 pathname === '/dashboard/teacher'
       },
       {
@@ -128,16 +132,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await signOut({ callbackUrl: '/login' });
     } catch (error) {
       console.error('Error cerrando sesión:', error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar móvil */}
-      <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
+    <AuthGuard>
+      <div className="min-h-screen bg-gray-50">
+      {/* Sidebar móvil - solo mostrar si shouldShowSidebar es true */}
+      {shouldShowSidebar && (
+        <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
           <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
@@ -178,10 +184,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-700">
-                  {user?.user_metadata?.nombre || user?.email}
+                  {session?.user?.name || session?.user?.email}
                 </p>
                 <p className="text-xs text-gray-500 capitalize">
-                  {user?.user_metadata?.rol}
+                  {session?.user?.role}
                 </p>
               </div>
             </div>
@@ -195,9 +201,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </div>
       </div>
+      )}
 
-      {/* Sidebar desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+      {/* Sidebar desktop - solo mostrar si shouldShowSidebar es true */}
+      {shouldShowSidebar && (
+        <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           <div className="flex items-center h-16 px-4 border-b border-gray-200">
             <BookOpen className="h-8 w-8 text-primary" />
@@ -228,10 +236,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-700">
-                  {user?.user_metadata?.nombre || user?.email}
+                  {session?.user?.name || session?.user?.email}
                 </p>
                 <p className="text-xs text-gray-500 capitalize">
-                  {user?.user_metadata?.rol}
+                  {session?.user?.role}
                 </p>
               </div>
             </div>
@@ -245,11 +253,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </div>
       </div>
+      )}
 
       {/* Contenido principal */}
-      <div className="lg:pl-64">
-        {/* Header móvil */}
-        <div className="sticky top-0 z-40 lg:hidden">
+      <div className={shouldShowSidebar ? "lg:pl-64" : ""}>
+        {/* Header móvil - solo mostrar si shouldShowSidebar es true */}
+        {shouldShowSidebar && (
+          <div className="sticky top-0 z-40 lg:hidden">
           <div className="flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -264,6 +274,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="w-6" /> {/* Spacer */}
           </div>
         </div>
+        )}
 
         {/* Contenido de la página */}
         <main className="flex-1">
@@ -271,5 +282,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </main>
       </div>
     </div>
+    </AuthGuard>
   );
 }

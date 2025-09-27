@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
+import { useSession, signOut } from 'next-auth/react';
+import {
   LayoutDashboard,
   Users,
   BookOpen,
@@ -29,7 +29,7 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
+  const { data: session } = useSession();
 
   const navigation = [
     {
@@ -142,7 +142,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <Users className="w-4 h-4 text-gray-600" />
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-900">{user?.user_metadata?.nombre}</p>
+                  <p className="text-sm font-medium text-gray-900">{session?.user?.name}</p>
                   <p className="text-xs text-gray-500">Coordinador</p>
                 </div>
               </div>
@@ -190,7 +190,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <Users className="w-4 h-4 text-gray-600" />
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-900">{user?.user_metadata?.nombre}</p>
+                  <p className="text-sm font-medium text-gray-900">{session?.user?.name}</p>
                   <p className="text-xs text-gray-500">Coordinador</p>
                 </div>
               </div>

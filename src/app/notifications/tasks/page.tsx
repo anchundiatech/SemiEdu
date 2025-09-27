@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { 
-  ArrowLeft, 
-  BookOpen, 
-  Calendar, 
-  Clock, 
+import {
+  ArrowLeft,
+  BookOpen,
+  Calendar,
+  Clock,
   AlertTriangle,
   CheckCircle,
   Filter,
@@ -22,7 +22,7 @@ export default function TaskNotificationsPage() {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Recopilar todas las tareas de todos los estudiantes
-  const allTasks = mockStudents.flatMap(student => 
+  const allTasks = mockStudents.flatMap(student =>
     student.assignments.map(assignment => ({
       ...assignment,
       studentName: student.name,
@@ -77,7 +77,7 @@ export default function TaskNotificationsPage() {
     const now = new Date();
     const diffTime = date.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays < 0) {
       return `Vencida hace ${Math.abs(diffDays)} días`;
     } else if (diffDays === 0) {
@@ -134,7 +134,7 @@ export default function TaskNotificationsPage() {
               <BookOpen className="w-8 h-8 text-blue-600" />
             </div>
           </Card>
-          
+
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -144,7 +144,7 @@ export default function TaskNotificationsPage() {
               <AlertTriangle className="w-8 h-8 text-yellow-600" />
             </div>
           </Card>
-          
+
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -154,7 +154,7 @@ export default function TaskNotificationsPage() {
               <Clock className="w-8 h-8 text-blue-600" />
             </div>
           </Card>
-          
+
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -214,9 +214,9 @@ export default function TaskNotificationsPage() {
             filteredTasks.map((task) => {
               const StatusIcon = getStatusIcon(task.status);
               const overdue = task.status === 'pending' && isOverdue(task.dueDate);
-              
+
               return (
-                <Card 
+                <Card
                   key={`${task.id}-${task.studentId}`}
                   className={`p-6 hover:shadow-lg transition-shadow ${
                     overdue ? 'border-l-4 border-l-red-500 bg-red-50/30' : ''
@@ -235,7 +235,7 @@ export default function TaskNotificationsPage() {
                           'text-green-600'
                         }`} />
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-2">
                           <h3 className="text-lg font-semibold text-gray-900">
@@ -247,7 +247,7 @@ export default function TaskNotificationsPage() {
                             </span>
                           )}
                         </div>
-                        
+
                         <div className="space-y-2">
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
                             <span className="flex items-center">
@@ -259,11 +259,11 @@ export default function TaskNotificationsPage() {
                               {formatDate(task.dueDate)}
                             </span>
                           </div>
-                          
+
                           <p className="text-sm text-gray-600">
                             Estudiante: <span className="font-medium">{task.studentName}</span>
                           </p>
-                          
+
                           {task.grade && (
                             <p className="text-sm text-gray-600">
                               Calificación: <span className="font-medium text-green-600">{task.grade}/100</span>
@@ -272,12 +272,12 @@ export default function TaskNotificationsPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex flex-col items-end space-y-2">
                       <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(task.status)}`}>
                         {getStatusText(task.status)}
                       </span>
-                      
+
                       <div className="text-xs text-gray-500">
                         {new Date(task.dueDate).toLocaleDateString('es-ES')}
                       </div>
@@ -308,7 +308,7 @@ export default function TaskNotificationsPage() {
                 </p>
                 <p className="text-sm text-gray-600">En los próximos 3 días</p>
               </div>
-              
+
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Vencidas</h4>
                 <p className="text-2xl font-bold text-red-600">
@@ -316,11 +316,11 @@ export default function TaskNotificationsPage() {
                 </p>
                 <p className="text-sm text-gray-600">Requieren atención inmediata</p>
               </div>
-              
+
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Tasa de Entrega</h4>
                 <p className="text-2xl font-bold text-green-600">
-                  {Math.round((taskStats.submitted + taskStats.graded) / taskStats.total * 100)}%
+                  {taskStats.total > 0 ? Math.round((taskStats.submitted + taskStats.graded) / taskStats.total * 100) : 0}%
                 </p>
                 <p className="text-sm text-gray-600">Tareas entregadas</p>
               </div>

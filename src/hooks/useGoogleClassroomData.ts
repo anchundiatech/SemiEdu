@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSession } from 'next-auth/react';
 
 interface ClassroomCourse {
   id: string;
@@ -94,7 +94,7 @@ interface StudentData {
 }
 
 export function useGoogleClassroomData(): StudentData {
-  const { user } = useAuth();
+  const { data: session } = useSession();
   const [data, setData] = useState<StudentData>({
     userProfile: null,
     courses: [],
@@ -118,49 +118,51 @@ export function useGoogleClassroomData(): StudentData {
     error: null
   });
 
+  const [loadingSteps, setLoadingSteps] = useState({
+    courses: false,
+    assignments: false,
+    students: false,
+    statistics: false
+  });
+
   useEffect(() => {
-    if (!user) return;
+    if (!session?.user) return;
 
     const fetchGoogleClassroomData = async () => {
       try {
-        console.log('🔍 Obteniendo datos reales de Google Classroom...');
-        console.log('👤 Usuario actual:', { id: user.id, email: user.email, google_id: user.user_metadata?.google_id });
         setData(prev => ({ ...prev, loading: true, error: null }));
 
         // Obtener datos de Google Classroom usando nuestro nuevo sistema
-        const response = await fetch('/api/google-classroom/student-data', {
-          method: 'POST',
+        const response = await fetch('/api/google-classroom/courses', {
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: user.id,
-            email: user.email,
-            google_id: user.user_metadata?.google_id
-          })
+          }
         });
 
-        console.log('📡 Response status:', response.status);
-        console.log('📡 Response ok:', response.ok);
 
         if (!response.ok) {
-          throw new Error(`Error obteniendo datos: ${response.status}`);
+          const errorText = await response.text();
+          console.error('Error en API de Google Classroom:', response.status, errorText);
+          throw new Error(`Error obteniendo datos: ${response.status} - ${errorText}`);
         }
 
         const result = await response.json();
-        console.log('📦 Resultado completo:', result);
-        console.log('📦 Success:', result.success);
-        console.log('📦 Source:', result.source);
-        console.log('📦 Message:', result.message);
+        console.log('Respuesta de API de Google Classroom:', result);
 
         if (result.success) {
-          console.log('✅ Datos completos de Google Classroom obtenidos:', result.data);
 
           const courses = result.data.courses || [];
           const assignments = result.data.assignments || [];
           const submissions = result.data.submissions || [];
           const statistics = result.data.statistics || {};
           const userProfile = result.data.userProfile;
+
+          console.log('Estableciendo datos de Google Classroom:', {
+            coursesCount: courses.length,
+            assignmentsCount: assignments.length,
+            statistics
+          });
 
           setData({
             userProfile,
@@ -204,19 +206,61 @@ export function useGoogleClassroomData(): StudentData {
           }
         }
       } catch (error) {
-        console.error('❌ Error obteniendo datos de Google Classroom:', error);
+        console.error(' Error obteniendo datos de Google Classroom:', error);
 
         // Usar datos de fallback realistas
         setData({
           userProfile: null,
           courses: [
             {
-              id: 'fallback_course',
+              id: 'fallback_course_1',
               name: 'Clase de Prueba para API',
               section: 'Sección Principal',
               room: 'Aula Virtual',
               teacherName: 'Alejandro Anchundia',
-              enrollmentCode: 'apitest2024'
+              enrollmentCode: 'apitest2024',
+              courseState: 'ACTIVE',
+              alternateLink: 'https://classroom.google.com/c/example1'
+            },
+            {
+              id: 'fallback_course_2',
+              name: 'Matemáticas Avanzadas',
+              section: 'Grupo A',
+              room: 'Aula 201',
+              teacherName: 'Prof. María González',
+              enrollmentCode: 'math2024',
+              courseState: 'ACTIVE',
+              alternateLink: 'https://classroom.google.com/c/example2'
+            },
+            {
+              id: 'fallback_course_3',
+              name: 'Física Experimental',
+              section: 'Laboratorio',
+              room: 'Lab 3',
+              teacherName: 'Dr. Carlos Ruiz',
+              enrollmentCode: 'physics2024',
+              courseState: 'ACTIVE',
+              alternateLink: 'https://classroom.google.com/c/example3'
+            },
+            {
+              id: 'fallback_course_4',
+              name: 'Historia Universal',
+              section: 'Mañana',
+              room: 'Aula 105',
+              teacherName: 'Prof. Ana Martínez',
+              enrollmentCode: 'history2024',
+              courseState: 'ACTIVE',
+              alternateLink: 'https://classroom.google.com/c/example4'
+            },
+            {
+              id: 'fallback_course_5',
+              name: 'Programación Web',
+              section: 'Vespertino',
+              room: 'Lab Computación',
+              teacherName: 'Ing. Luis Pérez',
+              enrollmentCode: 'web2024',
+              courseState: 'ACTIVE',
+              alternateLink: 'https://classroom.google.com/c/example5'
             }
           ],
           assignments: [
@@ -233,18 +277,18 @@ export function useGoogleClassroomData(): StudentData {
           ],
           submissions: [],
           statistics: {
-            totalCourses: 1,
-            totalAssignments: 1,
-            pendingAssignments: 1,
-            completedAssignments: 0,
+            totalCourses: 5,
+            totalAssignments: 3,
+            pendingAssignments: 2,
+            completedAssignments: 1,
             lateSubmissions: 0,
-            averageGrade: 90,
-            submissionRate: 0
+            averageGrade: 85,
+            submissionRate: 0.33
           },
-          totalCourses: 1,
-          pendingAssignments: 1,
-          completedAssignments: 0,
-          averageGrade: 90,
+          totalCourses: 5,
+          pendingAssignments: 2,
+          completedAssignments: 1,
+          averageGrade: 85,
           loading: false,
           error: error instanceof Error ? error.message : 'Configurando Google Classroom...'
         });
@@ -252,7 +296,7 @@ export function useGoogleClassroomData(): StudentData {
     };
 
     fetchGoogleClassroomData();
-  }, [user]);
+    }, [session?.user]);
 
   return data;
 }

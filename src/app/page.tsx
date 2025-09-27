@@ -1,21 +1,21 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { BookOpen } from 'lucide-react';
 
 export default function HomePage() {
-  const { user, loading } = useAuth();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading) {
-      if (user) {
+    if (status !== 'loading') {
+      if (session?.user) {
         // Usuario autenticado, redirigir según rol
-        const userRole = user.user_metadata?.rol;
-        
+        const userRole = session.user.role;
+
         switch (userRole) {
           case 'coordinador':
             router.push('/admin');
@@ -29,11 +29,11 @@ export default function HomePage() {
             break;
         }
       } else {
-        // Usuario no autenticado, redirigir a login
-        router.push('/auth/login');
+        // Usuario no autenticado, redirigir a landing
+        router.push('/landing');
       }
     }
-  }, [user, loading, router]);
+  }, [session, status, router]);
 
   // Mostrar loading mientras se determina la redirección
   return (
@@ -45,9 +45,9 @@ export default function HomePage() {
           </div>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">SemiEdu</h1>
-        <LoadingSpinner size="lg" text="Conectando con Google Classroom..." />
+        <LoadingSpinner size="lg" text="Cargando SemiEdu..." />
         <p className="text-gray-500 mt-4 text-sm">
-          Redirigiendo a tu dashboard personalizado
+          Preparando tu experiencia educativa
         </p>
       </div>
     </div>
