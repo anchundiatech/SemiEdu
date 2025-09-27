@@ -394,15 +394,6 @@ La aplicación utiliza **Google OAuth 2.0** para autenticación:
 [![Google Classroom API](https://img.shields.io/badge/Google%20Classroom%20API-Integrated-blue?style=for-the-badge)](https://developers.google.com/classroom)
 [![Security](https://img.shields.io/badge/Security-OAuth%202.0-green?style=for-the-badge)](https://oauth.net/2/)
 
-### Migración Completada (2025-09-27)
-
-- **✅ Eliminado**: Supabase y base de datos
-- **✅ Agregado**: NextAuth con Google OAuth
-- **✅ Implementado**: Cliente Google Classroom API
-- **✅ Configurado**: Sistema de roles dual
-- **✅ Migrado**: Arquitectura stateless completa
-
-
 ## 🤝 Contribución
 
 [![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-green?style=for-the-badge)](CONTRIBUTING.md)
