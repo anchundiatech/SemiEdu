@@ -11,7 +11,7 @@ export default function DashboardPage() {
   // Redirección automática basada en rol
   useEffect(() => {
     if (status === 'loading') return;
-    
+
     if (!session) {
       router.push('/login');
       return;
@@ -20,18 +20,18 @@ export default function DashboardPage() {
     if (session.user) {
       const email = session.user.email || '';
       console.log('🎯 Dashboard principal - Email:', email);
-      
+
       // Detectar rol basado en email
       let userRole = 'estudiante'; // Por defecto
-      
+
       if (email.includes('admin') || email.includes('coordinador') || email.includes('director')) {
         userRole = 'coordinador';
       } else if (email.includes('profesor') || email.includes('teacher') || email.includes('docente')) {
         userRole = 'docente';
       }
-      
+
       console.log('🎯 Dashboard principal - Rol detectado:', userRole);
-      
+
       // Redirigir según el rol
       switch (userRole) {
         case 'coordinador':
