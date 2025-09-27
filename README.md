@@ -3,11 +3,11 @@
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![NextAuth.js](https://img.shields.io/badge/NextAuth.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://next-auth.js.org/)
 [![Google Classroom API](https://img.shields.io/badge/Google_Classroom_API-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://developers.google.com/classroom)
-[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Yarn](https://img.shields.io/badge/Yarn-2C8EBB?style=for-the-badge&logo=yarn&logoColor=white)](https://yarnpkg.com/)
 
-SemiEdu es una innovadora aplicación web que mejora la participación educativa al conectar de manera fluida con Google Classroom. Ofrece información en tiempo real y comunicación simplificada para estudiantes, docentes y coordinadores.
+SemiEdu es una innovadora aplicación web **stateless** que se conecta directamente con Google Classroom API. Ofrece información en tiempo real, detección automática de roles y comunicación simplificada para estudiantes, docentes y coordinadores sin necesidad de base de datos externa.
 
 [![License](https://img.shields.io/badge/License-Educational-green?style=for-the-badge)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen?style=for-the-badge)](https://github.com/tu-usuario/semiedu)
@@ -15,26 +15,26 @@ SemiEdu es una innovadora aplicación web que mejora la participación educativa
 
 ## 🚀 Características Principales
 
-### 📊 Dashboards de Progreso
+### 🔐 Autenticación Inteligente
 
-- **Visualización del Progreso Estudiantil**: Seguimiento detallado del rendimiento académico individual y grupal
-- **Visualización del Progreso Docente**: Monitoreo de la efectividad de los métodos de enseñanza
-- Gráficos interactivos y métricas en tiempo real
-- Identificación de estudiantes en riesgo y destacados
+- **Google OAuth 2.0**: Autenticación segura con cuentas de Google
+- **Detección Automática de Roles**: Sistema dual de roles (aplicación + Google Classroom)
+- **Sesiones JWT**: Arquitectura stateless sin base de datos
+- **Middleware de Protección**: Rutas protegidas automáticamente
 
-### 🔔 Notificaciones Centralizadas
+### 📚 Integración con Google Classroom
 
-- **Notificaciones de Tareas**: Alertas sobre asignaciones y fechas de entrega
-- **Notificaciones de Cambios de Calendario**: Actualizaciones sobre horarios y aulas
-- Sistema de prioridades y filtros avanzados
-- Historial completo de notificaciones
+- **Cursos en Tiempo Real**: Obtención directa de cursos activos
+- **Gestión de Estudiantes**: Listado automático por curso
+- **Tareas y Asignaciones**: Sincronización completa con Google Classroom
+- **Roles Dinámicos**: Detección automática de profesores y estudiantes por curso
 
-### 📈 Reportes Automáticos
+### 🎯 Sistema de Roles Avanzado
 
-- **Reportes de Asistencia**: Análisis detallado de la asistencia estudiantil
-- **Reportes de Participación**: Evaluación del compromiso y participación
-- Exportación en múltiples formatos (PDF, Excel, CSV)
-- Programación de envíos automáticos
+- **Roles de Aplicación**: Basados en patrones de email (estudiante, docente, coordinador)
+- **Roles de Google Classroom**: Por curso específico (teacher, student)
+- **Detección Automática**: Sin configuración manual requerida
+- **Permisos Granulares**: Acceso basado en rol y contexto
 
 ## 🎨 Sistema de Diseño
 
@@ -61,22 +61,18 @@ SemiEdu es una innovadora aplicación web que mejora la participación educativa
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-### Backend & Base de Datos
+### Autenticación & APIs
 
-[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-
-### APIs & Servicios
-
+[![NextAuth.js](https://img.shields.io/badge/NextAuth.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://next-auth.js.org/)
 [![Google Classroom API](https://img.shields.io/badge/Google_Classroom_API-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://developers.google.com/classroom)
 [![Google OAuth](https://img.shields.io/badge/Google_OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://developers.google.com/identity/protocols/oauth2)
+[![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
 
 ### Herramientas de Desarrollo
 
-[![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![Yarn](https://img.shields.io/badge/Yarn-2C8EBB?style=for-the-badge&logo=yarn&logoColor=white)](https://yarnpkg.com/)
 [![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)
-[![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 
 ### Librerías y Componentes
 
@@ -87,20 +83,29 @@ SemiEdu es una innovadora aplicación web que mejora la participación educativa
 ## 📁 Estructura del Proyecto
 
 ```
-/src
-  /app
-    /dashboard
-      /student     # Dashboard de progreso estudiantil
-      /teacher     # Dashboard de progreso docente
-    /notifications
-      /tasks       # Notificaciones de tareas
-      /calendar    # Notificaciones de calendario
-    /reports
-      /attendance      # Reportes de asistencia
-      /participation   # Reportes de participación
-  /components
-    /ui            # Componentes base reutilizables
-  /utils           # Utilidades y datos mock
+SemiEdu/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── auth/[...nextauth]/     # NextAuth endpoints
+│   │   │   ├── classroom/
+│   │   │   │   ├── courses/           # Cursos con roles
+│   │   │   │   └── coursework/        # Tareas por curso
+│   │   │   └── google-classroom/
+│   │   │       └── student-data/      # Estudiantes por curso
+│   │   ├── login/                     # Página de autenticación
+│   │   └── dashboard/                 # Dashboards protegidos
+│   ├── components/
+│   │   ├── providers/                 # NextAuth provider
+│   │   └── ui/                        # Componentes reutilizables
+│   ├── lib/
+│   │   ├── auth.ts                    # Configuración NextAuth
+│   │   └── google-classroom.ts        # Cliente Google Classroom API
+│   └── types/
+│       └── next-auth.d.ts             # Tipos de NextAuth
+├── middleware.ts                      # Protección de rutas
+├── MIGRATION_GUIDE.md                 # Guía de migración
+└── package.json                       # Dependencias con Yarn
 ```
 
 ## ⚡ Características Técnicas
@@ -114,155 +119,154 @@ SemiEdu es una innovadora aplicación web que mejora la participación educativa
 ### Seguridad
 
 [![Security](https://img.shields.io/badge/Security-Google%20OAuth%202.0-blue?style=for-the-badge)](https://developers.google.com/identity/protocols/oauth2)
-[![Data Protection](https://img.shields.io/badge/Data%20Protection-GDPR%20Compliant-green?style=for-the-badge)](https://gdpr.eu/)
-[![Encryption](https://img.shields.io/badge/Encryption-End--to--End-green?style=for-the-badge)](https://supabase.com/docs/guides/auth/row-level-security)
+[![NextAuth](https://img.shields.io/badge/NextAuth-JWT%20Sessions-green?style=for-the-badge)](https://next-auth.js.org/)
+[![Stateless](https://img.shields.io/badge/Architecture-Stateless-green?style=for-the-badge)](https://next-auth.js.org/)
 
 ## 🚀 Instalación y Uso
 
 ### Requisitos Previos
 
 [![Node.js](https://img.shields.io/badge/Node.js-18.0.0+-green?style=flat-square&logo=node.js)](https://nodejs.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-8.0.0+-orange?style=flat-square&logo=pnpm)](https://pnpm.io/)
-[![Supabase](https://img.shields.io/badge/Supabase-Account%20Required-blue?style=flat-square&logo=supabase)](https://supabase.com/)
+[![Yarn](https://img.shields.io/badge/Yarn-1.22.0+-blue?style=flat-square&logo=yarn)](https://yarnpkg.com/)
+[![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Account%20Required-blue?style=flat-square&logo=googlecloud)](https://console.cloud.google.com/)
 
 - **Node.js** >= 18.0.0
-- **pnpm** >= 8.0.0
-- **Cuenta de Supabase** (para base de datos)
+- **Yarn** >= 1.22.0
 - **Cuenta de Google Cloud** (para Google Classroom API)
+- **Acceso a Google Classroom** (como profesor o estudiante)
 
-### Configuración de la Base de Datos
+### Configuración de Google OAuth
 
-1. **Crear proyecto en Supabase**:
+1. **Crear proyecto en Google Cloud Console**:
 
-   - Ve a [supabase.com](https://supabase.com)
-   - Crea una nueva cuenta o inicia sesión
-   - Crea un nuevo proyecto
+   - Ve a [Google Cloud Console](https://console.cloud.google.com/)
+   - Crea un nuevo proyecto o selecciona uno existente
+   - Habilita la **Google Classroom API**
 
-2. **Configurar variables de entorno**:
+2. **Configurar OAuth 2.0**:
+
+   - Ve a "Credenciales" → "Crear credenciales" → "ID de cliente OAuth 2.0"
+   - Tipo de aplicación: **Aplicación web**
+   - URIs de redirección autorizados:
+     - `http://localhost:3000/api/auth/callback/google` (desarrollo)
+     - `https://tu-dominio.com/api/auth/callback/google` (producción)
+
+3. **Configurar variables de entorno**:
 
    ```bash
    # Copia el archivo de ejemplo
    cp .env.example .env.local
 
-   # Edita .env.local con tus credenciales de Supabase:
-   NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima
-   SUPABASE_SERVICE_ROLE_KEY=tu_clave_de_servicio
+   # Edita .env.local con tus credenciales:
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=tu-secret-key-aqui
+   GOOGLE_CLIENT_ID=tu-google-client-id
+   GOOGLE_CLIENT_SECRET=tu-google-client-secret
    ```
 
-3. **Ejecutar el esquema de base de datos**:
-   - En el panel de Supabase, ve a SQL Editor
-   - Ejecuta el contenido del archivo `supabase/schema.sql`
+### Instalación con Yarn
 
-### Instalación con pnpm
-
-1. **Instalar pnpm globalmente** (si no lo tienes):
+1. **Instalar Yarn globalmente** (si no lo tienes):
 
    ```bash
-   npm install -g pnpm
+   npm install -g yarn
    ```
 
 2. **Instalar dependencias**:
 
    ```bash
    cd "c:\Users\HP CORE I3\Desktop\SemiEdu"
-   pnpm install
+   yarn install
    ```
 
-3. **Poblar la base de datos con datos de demostración**:
+3. **Ejecutar en modo desarrollo**:
 
    ```bash
-   pnpm db:seed
+   yarn dev
    ```
 
-4. **Ejecutar en modo desarrollo**:
-
+4. **Otros comandos útiles**:
    ```bash
-   pnpm dev
-   ```
-
-5. **Otros comandos útiles**:
-   ```bash
-   pnpm build          # Construir para producción
-   pnpm start          # Iniciar servidor de producción
-   pnpm lint           # Ejecutar linter
-   pnpm type-check     # Verificar tipos TypeScript
-   pnpm db:clear       # Limpiar base de datos
-   pnpm db:reset       # Reiniciar base de datos
+   yarn build          # Construir para producción
+   yarn start          # Iniciar servidor de producción
+   yarn lint           # Ejecutar linter
+   yarn type-check     # Verificar tipos TypeScript
+   yarn clean          # Limpiar e reinstalar dependencias
    ```
 
 ### Comandos Disponibles
 
-[![Build](https://img.shields.io/badge/Build-pnpm%20build-blue?style=flat-square)](https://pnpm.io/)
-[![Dev](https://img.shields.io/badge/Dev-pnpm%20dev-green?style=flat-square)](https://pnpm.io/)
-[![Lint](https://img.shields.io/badge/Lint-pnpm%20lint-yellow?style=flat-square)](https://eslint.org/)
-[![Type Check](https://img.shields.io/badge/Type%20Check-pnpm%20type--check-purple?style=flat-square)](https://www.typescriptlang.org/)
+[![Build](https://img.shields.io/badge/Build-yarn%20build-blue?style=flat-square)](https://yarnpkg.com/)
+[![Dev](https://img.shields.io/badge/Dev-yarn%20dev-green?style=flat-square)](https://yarnpkg.com/)
+[![Lint](https://img.shields.io/badge/Lint-yarn%20lint-yellow?style=flat-square)](https://eslint.org/)
+[![Type Check](https://img.shields.io/badge/Type%20Check-yarn%20type--check-purple?style=flat-square)](https://www.typescriptlang.org/)
 
-6. **Abrir en el navegador**:
+5. **Abrir en el navegador**:
    ```
    http://localhost:3000
    ```
 
-### Cuentas de Demostración
+### Autenticación
 
-Después de ejecutar `pnpm db:seed`, puedes usar estas cuentas:
+La aplicación utiliza **Google OAuth 2.0** para autenticación:
 
-- **Estudiante**: estudiante@semiedu.com / password123
-- **Docente**: docente@semiedu.com / password123
-- **Coordinador**: coordinador@semiedu.com / password123
+- **Estudiantes**: Cualquier cuenta de Google con acceso a Google Classroom
+- **Docentes**: Cuentas con permisos de profesor en Google Classroom
+- **Coordinadores**: Cuentas con emails que contengan "coordinador", "admin" o "director"
+
+### Detección Automática de Roles
+
+- **Rol de Aplicación**: Basado en patrones de email
+- **Rol de Google Classroom**: Detectado automáticamente por curso
+- **Sin configuración manual**: Los roles se asignan dinámicamente
 
 ## 📋 Flujo de Usuario
 
-1. **Pantalla de Inicio**: Acceso a las principales funcionalidades
-2. **Dashboards de Progreso**: Visualización de métricas estudiantiles y docentes
-3. **Notificaciones**: Centro de alertas y actualizaciones
-4. **Reportes**: Generación automática de informes detallados
+1. **Autenticación**: Login con Google OAuth 2.0
+2. **Detección de Roles**: Automática basada en email y Google Classroom
+3. **Dashboard**: Acceso a cursos y funcionalidades según rol
+4. **Integración en Tiempo Real**: Datos sincronizados con Google Classroom
 
 ## 🎯 Usuarios Objetivo
 
-- **Estudiantes**: Seguimiento de progreso y notificaciones claras
-- **Docentes**: Visión consolidada del rendimiento de sus clases
-- **Coordinadores**: Métricas rápidas para toma de decisiones
+- **Estudiantes**: Acceso directo a sus cursos y tareas de Google Classroom
+- **Docentes**: Gestión completa de estudiantes y asignaciones por curso
+- **Coordinadores**: Vista general de múltiples cursos y métricas
 
 ## 📊 Estado del Proyecto
 
 ### ✅ Completado
 
 [![Google Classroom Integration](https://img.shields.io/badge/Google%20Classroom%20Integration-Complete-green?style=flat-square)](https://developers.google.com/classroom)
-[![Authentication](https://img.shields.io/badge/Authentication-Complete-green?style=flat-square)](https://supabase.com/docs/guides/auth)
-[![Database](https://img.shields.io/badge/Database-Complete-green?style=flat-square)](https://supabase.com/)
-[![Student Dashboard](https://img.shields.io/badge/Student%20Dashboard-Complete-green?style=flat-square)](#)
-[![Teacher Dashboard](https://img.shields.io/badge/Teacher%20Dashboard-Complete-green?style=flat-square)](#)
-[![Admin Panel](https://img.shields.io/badge/Admin%20Panel-Complete-green?style=flat-square)](#)
+[![NextAuth Authentication](https://img.shields.io/badge/NextAuth%20Authentication-Complete-green?style=flat-square)](https://next-auth.js.org/)
+[![Stateless Architecture](https://img.shields.io/badge/Stateless%20Architecture-Complete-green?style=flat-square)](#)
+[![Role Detection](https://img.shields.io/badge/Role%20Detection-Complete-green?style=flat-square)](#)
+[![API Endpoints](https://img.shields.io/badge/API%20Endpoints-Complete-green?style=flat-square)](#)
+[![Route Protection](https://img.shields.io/badge/Route%20Protection-Complete-green?style=flat-square)](#)
 
 ### 🚧 En Desarrollo
 
-[![Real-time Notifications](https://img.shields.io/badge/Real--time%20Notifications-In%20Progress-yellow?style=flat-square)](#)
-[![Advanced Reports](https://img.shields.io/badge/Advanced%20Reports-In%20Progress-yellow?style=flat-square)](#)
-[![Mobile App](https://img.shields.io/badge/Mobile%20App-In%20Progress-yellow?style=flat-square)](#)
+[![Student Submissions](https://img.shields.io/badge/Student%20Submissions-In%20Progress-yellow?style=flat-square)](#)
+[![Grading System](https://img.shields.io/badge/Grading%20System-In%20Progress-yellow?style=flat-square)](#)
+[![Dashboard UI](https://img.shields.io/badge/Dashboard%20UI-In%20Progress-yellow?style=flat-square)](#)
 
 ### 🔮 Próximas Características
 
-[![Chat System](https://img.shields.io/badge/Chat%20System-Planned-blue?style=flat-square)](#)
-[![Offline Support](https://img.shields.io/badge/Offline%20Support-Planned-blue?style=flat-square)](#)
+[![Real-time Notifications](https://img.shields.io/badge/Real--time%20Notifications-Planned-blue?style=flat-square)](#)
+[![Advanced Analytics](https://img.shields.io/badge/Advanced%20Analytics-Planned-blue?style=flat-square)](#)
 [![Multi-language](https://img.shields.io/badge/Multi--language-Planned-blue?style=flat-square)](#)
-[![AI Analytics](https://img.shields.io/badge/AI%20Analytics-Planned-blue?style=flat-square)](#)
 [![Mobile App](https://img.shields.io/badge/Mobile%20App-Planned-blue?style=flat-square)](#)
+[![Offline Support](https://img.shields.io/badge/Offline%20Support-Planned-blue?style=flat-square)](#)
 [![API Documentation](https://img.shields.io/badge/API%20Documentation-Planned-blue?style=flat-square)](#)
 
 ## 📈 Métricas del Proyecto
 
-[![Lines of Code](https://img.shields.io/badge/Lines%20of%20Code-5000+-blue?style=for-the-badge)](https://github.com/tu-usuario/semiedu)
-[![TypeScript Coverage](https://img.shields.io/badge/TypeScript%20Coverage-95%25-green?style=for-the-badge)](https://www.typescriptlang.org/)
-[![Test Coverage](https://img.shields.io/badge/Test%20Coverage-80%25-yellow?style=for-the-badge)](https://jestjs.io/)
-[![Performance Score](https://img.shields.io/badge/Performance%20Score-95%2F100-green?style=for-the-badge)](https://pagespeed.web.dev/)
+[![Stateless Architecture](https://img.shields.io/badge/Architecture-Stateless-green?style=for-the-badge)](#)
+[![TypeScript Coverage](https://img.shields.io/badge/TypeScript%20Coverage-100%25-green?style=for-the-badge)](https://www.typescriptlang.org/)
+[![Google Classroom API](https://img.shields.io/badge/Google%20Classroom%20API-Integrated-blue?style=for-the-badge)](https://developers.google.com/classroom)
+[![Security](https://img.shields.io/badge/Security-OAuth%202.0-green?style=for-the-badge)](https://oauth.net/2/)
 
-### Estadísticas de Desarrollo
 
-- **Commits**: 150+
-- **Issues Resueltos**: 25+
-- **Pull Requests**: 30+
-- **Contribuidores**: 3+
 
 ## 🤝 Contribución
 
@@ -270,7 +274,7 @@ Después de ejecutar `pnpm db:seed`, puedes usar estas cuentas:
 [![Code Style](https://img.shields.io/badge/Code%20Style-Prettier%20%2B%20ESLint-blue?style=for-the-badge)](https://prettier.io/)
 [![Commit Convention](https://img.shields.io/badge/Commit%20Convention-Conventional%20Commits-purple?style=for-the-badge)](https://www.conventionalcommits.org/)
 
-Este proyecto está diseñado para ser escalable y mantenible. Sigue las mejores prácticas de desarrollo y está preparado para integración con servicios externos.
+Este proyecto utiliza una **arquitectura stateless** que se conecta directamente con Google Classroom API. Sigue las mejores prácticas de desarrollo moderno con NextAuth, TypeScript y arquitectura serverless.
 
 ### Cómo Contribuir
 

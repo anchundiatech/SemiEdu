@@ -1,9 +1,9 @@
 import { authOptions } from "@/lib/auth";
-import { getStudents, setAccessToken } from "@/lib/google-classroom";
+import { getCoursesWithRoles, setAccessToken } from "@/lib/google-classroom";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -18,26 +18,25 @@ export async function GET(request: Request) {
       );
     }
 
-    const { searchParams } = new URL(request.url);
-    const courseId = searchParams.get('courseId');
-
-    if (!courseId) {
+    const userEmail = session.user.email;
+    if (!userEmail) {
       return NextResponse.json(
-        { error: "courseId parameter is required" },
+        { error: "Missing user email in session" },
         { status: 400 }
       );
     }
 
     setAccessToken(accessToken);
 
-    const students = await getStudents(courseId);
+    const courses = await getCoursesWithRoles(userEmail);
 
     return NextResponse.json({ 
-      students,
-      total: students.length 
+      courses,
+      total: courses.length,
+      userRole: session.user.role 
     });
   } catch (error: unknown) {
-    console.error("/api/google-classroom/student-data error:", error);
+    console.error("/api/classroom/courses error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

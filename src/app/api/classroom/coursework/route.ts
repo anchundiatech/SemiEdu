@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/auth";
-import { getStudents, setAccessToken } from "@/lib/google-classroom";
+import { getCourseWork, setAccessToken } from "@/lib/google-classroom";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -30,14 +30,14 @@ export async function GET(request: Request) {
 
     setAccessToken(accessToken);
 
-    const students = await getStudents(courseId);
+    const courseWork = await getCourseWork(courseId);
 
     return NextResponse.json({ 
-      students,
-      total: students.length 
+      courseWork,
+      total: courseWork.length 
     });
   } catch (error: unknown) {
-    console.error("/api/google-classroom/student-data error:", error);
+    console.error("/api/classroom/coursework error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
