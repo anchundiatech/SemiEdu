@@ -2,27 +2,24 @@
   "name": "semiedu",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@8.0.0",
+  "packageManager": "yarn@1.22.19",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "db:seed": "node scripts/seed-database.js seed",
-    "db:clear": "node scripts/seed-database.js clear",
-    "db:reset": "node scripts/seed-database.js reset"
+    "clean": "yarn cache clean && rm -rf node_modules yarn.lock && yarn install"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.4",
     "@tailwindcss/postcss": "^4.1.13",
     "clsx": "^2.0.0",
-    "dotenv": "^16.6.1",
     "googleapis": "^160.0.0",
     "lucide-react": "^0.292.0",
-    "next": "14.0.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "next": "^14.0.0",
+    "next-auth": "^4.24.11",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "recharts": "^2.8.0",
     "tailwind-merge": "^2.0.0",
     "zod": "^3.22.4"
