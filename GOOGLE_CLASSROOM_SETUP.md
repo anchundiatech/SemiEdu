@@ -52,7 +52,7 @@ NEXTAUTH_SECRET=tu_nextauth_secret_aqui
 ### 5. Reiniciar el Servidor
 
 ```bash
-npm run dev
+yarn run dev
 ```
 
 ### 6. Probar la Integración
