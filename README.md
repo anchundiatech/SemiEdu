@@ -192,20 +192,19 @@ SemiEdu/
 - **Yarn** >= 1.22.0
 - **Cuenta de Google Cloud** (para Google Classroom API)
 - **Acceso a Google Classroom** (como profesor o estudiante)
-- **Acceso a Google Classroom** (como profesor o estudiante)
+
+
 
 ### Configuración de Google OAuth
 
-### Configuración de Google OAuth
 
-1. **Crear proyecto en Google Cloud Console**:
 1. **Crear proyecto en Google Cloud Console**:
 
    - Ve a [Google Cloud Console](https://console.cloud.google.com/)
    - Crea un nuevo proyecto o selecciona uno existente
    - Habilita la **Google Classroom API**
 
-1. **Configurar OAuth 2.0**:
+2. **Configurar OAuth 2.0**:
 
    - Ve a "Credenciales" → "Crear credenciales" → "ID de cliente OAuth 2.0"
    - Tipo de aplicación: **Aplicación web**
@@ -213,13 +212,13 @@ SemiEdu/
      - `http://localhost:3000/api/auth/callback/google` (desarrollo)
      - `https://tu-dominio.com/api/auth/callback/google` (producción)
 
-1. **Configurar variables de entorno**:
+3. **Configurar variables de entorno**:
 
    - Ve a [Google Cloud Console](https://console.cloud.google.com/)
    - Crea un nuevo proyecto o selecciona uno existente
    - Habilita la **Google Classroom API**
 
-1. **Configurar OAuth 2.0**:
+4. **Configurar OAuth 2.0**:
 
    - Ve a "Credenciales" → "Crear credenciales" → "ID de cliente OAuth 2.0"
    - Tipo de aplicación: **Aplicación web**
@@ -227,7 +226,7 @@ SemiEdu/
      - `http://localhost:3000/api/auth/callback/google` (desarrollo)
      - `https://tu-dominio.com/api/auth/callback/google` (producción)
 
-1. **Configurar variables de entorno**:
+5. **Configurar variables de entorno**:
 
    ```bash
    # Copia el archivo de ejemplo
@@ -251,11 +250,11 @@ SemiEdu/
 
    ```
 
-### Instalación con Yarn
+
 
 ### Instalación con Yarn
 
-1. **Instalar Yarn globalmente** (si no lo tienes):
+
 1. **Instalar Yarn globalmente** (si no lo tienes):
 
    ```bash
@@ -263,7 +262,7 @@ SemiEdu/
    npm install -g yarn
    ```
 
-1. **Instalar dependencias**:
+2. **Instalar dependencias**:
 
    ```bash
    cd "c:\Users\HP CORE I3\Desktop\SemiEdu"
@@ -271,16 +270,16 @@ SemiEdu/
    yarn install
    ```
 
-1. **Ejecutar en modo desarrollo**:
-1. **Ejecutar en modo desarrollo**:
+
+3. **Ejecutar en modo desarrollo**:
 
    ```bash
    yarn dev
    yarn dev
    ```
 
-1. **Otros comandos útiles**:
-1. **Otros comandos útiles**:
+
+4. **Otros comandos útiles**:
    ```bash
    yarn build          # Construir para producción
    yarn start          # Iniciar servidor de producción
@@ -305,8 +304,8 @@ SemiEdu/
 [![Lint](https://img.shields.io/badge/Lint-yarn%20lint-yellow?style=flat-square)](https://eslint.org/)
 [![Type Check](https://img.shields.io/badge/Type%20Check-yarn%20type--check-purple?style=flat-square)](https://www.typescriptlang.org/)
 
+
 5. **Abrir en el navegador**:
-6. **Abrir en el navegador**:
    ```
    http://localhost:3000
    ```
