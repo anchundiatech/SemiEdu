@@ -241,13 +241,11 @@ SemiEdu/
 
    # Edita .env.local con tus credenciales:
 
+   ```bash
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=tu-secret-key-aqui
    GOOGLE_CLIENT_ID=tu-google-client-id
    GOOGLE_CLIENT_SECRET=tu-google-client-secret
-
-   ```
-
    ```
 
 
