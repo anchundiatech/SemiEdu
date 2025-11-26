@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  User, 
-  Shield, 
-  Database, 
-  Globe, 
-  CheckCircle, 
-  XCircle, 
+import { useSession, signOut } from 'next-auth/react';
+import {
+  User,
+  Shield,
+  Database,
+  Globe,
+  CheckCircle,
+  XCircle,
   AlertTriangle,
   RefreshCw,
   Eye,
@@ -18,7 +18,9 @@ import {
 } from 'lucide-react';
 
 export default function TestPage() {
-  const { user, loading, signIn, signOut } = useAuth();
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const loading = status === 'loading';
   const [testResults, setTestResults] = useState<any>({});
   const [isRunningTests, setIsRunningTests] = useState(false);
   const [showTokens, setShowTokens] = useState(false);
@@ -26,7 +28,7 @@ export default function TestPage() {
   // Test de autenticación
   const testAuth = async () => {
     const results: any = {};
-    
+
     try {
       // Test 1: Estado de usuario
       results.userState = {
@@ -34,41 +36,92 @@ export default function TestPage() {
         message: user ? `Usuario logueado: ${user.email}` : 'No hay usuario logueado',
         data: user ? {
           email: user.email,
-          rol: user.user_metadata?.rol,
-          nombre: user.user_metadata?.nombre,
+          rol: user.role,
+          nombre: user.name,
           id: user.id
         } : null
       };
 
+      // Test 1.1: Análisis de detección de rol
+      if (user?.email) {
+        const emailLower = user.email.toLowerCase();
+        const coordinadorKeywords = [
+          "coordinador", "coordinadora", "coordinacion",
+          "admin", "administrador", "administradora", "administracion",
+          "director", "directora", "direccion",
+          "supervisor", "supervisora", "supervision",
+          "manager", "management", "gerente",
+          "jefe", "jefa", "jefatura",
+          "lider", "liderazgo", "liderazgo",
+          "responsable", "responsabilidad",
+          "head", "chief", "principal"
+        ];
+
+        const docenteKeywords = [
+          "profesor", "profesora", "profesores",
+          "teacher", "teachers", "teaching",
+          "docente", "docentes", "docencia",
+          "instructor", "instructora", "instructores",
+          "educador", "educadora", "educadores",
+          "maestro", "maestra", "maestros",
+          "tutor", "tutora", "tutores",
+          "faculty", "staff", "personal"
+        ];
+
+        const coordinadorMatches = coordinadorKeywords.filter(keyword =>
+          emailLower.includes(keyword)
+        );
+
+        const docenteMatches = docenteKeywords.filter(keyword =>
+          emailLower.includes(keyword)
+        );
+
+        results.roleDetection = {
+          status: 'info',
+          message: `Análisis de detección de rol para: ${user.email}`,
+          data: {
+            email: user.email,
+            emailLower: emailLower,
+            detectedRole: user.role,
+            coordinadorMatches: coordinadorMatches,
+            docenteMatches: docenteMatches,
+            isCoordinador: coordinadorMatches.length > 0,
+            isDocente: docenteMatches.length > 0,
+            expectedRole: coordinadorMatches.length > 0 ? 'coordinador' :
+                         docenteMatches.length > 0 ? 'docente' : 'estudiante'
+          }
+        };
+      }
+
       // Test 2: Cookies del navegador
       const cookies = typeof window !== 'undefined' ? document.cookie : '';
-      const supabaseCookies = cookies.split(';').filter(c => 
-        c.includes('sb-') || c.includes('supabase')
+      const nextAuthCookies = cookies.split(';').filter(c =>
+        c.includes('next-auth') || c.includes('__Secure-next-auth')
       );
-      
+
       results.cookies = {
-        status: supabaseCookies.length > 0 ? 'success' : 'error',
-        message: `${supabaseCookies.length} cookies de Supabase encontradas`,
-        data: supabaseCookies.map(c => c.trim())
+        status: nextAuthCookies.length > 0 ? 'success' : 'error',
+        message: `${nextAuthCookies.length} cookies de NextAuth encontradas`,
+        data: nextAuthCookies.map(c => c.trim())
       };
 
       // Test 3: Local Storage
-      const localStorageData = typeof window !== 'undefined' ? 
-        Object.keys(localStorage).filter(key => key.includes('supabase')) : [];
-      
+      const localStorageData = typeof window !== 'undefined' ?
+        Object.keys(localStorage).filter(key => key.includes('next-auth') || key.includes('auth')) : [];
+
       results.localStorage = {
         status: localStorageData.length > 0 ? 'success' : 'warning',
-        message: `${localStorageData.length} items de Supabase en localStorage`,
+        message: `${localStorageData.length} items de autenticación en localStorage`,
         data: localStorageData
       };
 
       // Test 4: Session Storage
-      const sessionStorageData = typeof window !== 'undefined' ? 
-        Object.keys(sessionStorage).filter(key => key.includes('supabase')) : [];
-      
+      const sessionStorageData = typeof window !== 'undefined' ?
+        Object.keys(sessionStorage).filter(key => key.includes('next-auth') || key.includes('auth')) : [];
+
       results.sessionStorage = {
         status: sessionStorageData.length > 0 ? 'success' : 'warning',
-        message: `${sessionStorageData.length} items de Supabase en sessionStorage`,
+        message: `${sessionStorageData.length} items de autenticación en sessionStorage`,
         data: sessionStorageData
       };
 
@@ -86,7 +139,7 @@ export default function TestPage() {
   // Test de navegación
   const testNavigation = () => {
     const results: any = {};
-    
+
     results.currentUrl = {
       status: 'info',
       message: `URL actual: ${window.location.href}`,
@@ -113,7 +166,7 @@ export default function TestPage() {
   // Test de API
   const testAPI = async () => {
     const results: any = {};
-    
+
     try {
       // Test de conexión básica
       const response = await fetch('/api/test', {
@@ -150,18 +203,18 @@ export default function TestPage() {
   // Ejecutar todos los tests
   const runAllTests = async () => {
     setIsRunningTests(true);
-    
+
     const authResults = await testAuth();
     const navResults = testNavigation();
     const apiResults = await testAPI();
-    
+
     setTestResults({
       ...authResults,
       ...navResults,
       ...apiResults,
       timestamp: new Date().toISOString()
     });
-    
+
     setIsRunningTests(false);
   };
 
@@ -208,7 +261,7 @@ export default function TestPage() {
             <p className="text-gray-600 mt-1">Diagnóstico completo del sistema de autenticación</p>
           </div>
           <div className="flex gap-3">
-            <Button 
+            <Button
               onClick={runAllTests}
               disabled={isRunningTests}
               className="flex items-center gap-2"
@@ -235,7 +288,7 @@ export default function TestPage() {
             <User className="w-6 h-6 text-blue-600" />
             <h2 className="text-xl font-semibold">Estado del Usuario</h2>
           </div>
-          
+
           {user ? (
             <div className="space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -245,30 +298,38 @@ export default function TestPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Rol</p>
-                  <p className="text-gray-900">{user.user_metadata?.rol || 'No definido'}</p>
+                  <p className="text-gray-900">{user.role || 'No definido'}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Nombre</p>
-                  <p className="text-gray-900">{user.user_metadata?.nombre || 'No definido'}</p>
+                  <p className="text-gray-900">{user.name || 'No definido'}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">ID</p>
                   <p className="text-gray-900 font-mono text-sm">{user.id}</p>
                 </div>
               </div>
-              
+
               <div className="flex gap-3 pt-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setShowTokens(!showTokens)}
                   className="flex items-center gap-2"
                 >
                   {showTokens ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   {showTokens ? 'Ocultar' : 'Mostrar'} Tokens
                 </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={signOut}
+                <Button
+                  variant="outline"
+                  onClick={() => window.location.reload()}
+                  className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Actualizar Rol
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => signOut({ callbackUrl: '/landing' })}
                   className="text-red-600 border-red-200 hover:bg-red-50"
                 >
                   Cerrar Sesión
@@ -279,7 +340,7 @@ export default function TestPage() {
                 <div className="mt-4 p-4 bg-gray-100 rounded-lg">
                   <p className="text-sm font-medium text-gray-600 mb-2">Información de Sesión:</p>
                   <pre className="text-xs text-gray-800 overflow-x-auto">
-                    {JSON.stringify(user, null, 2)}
+                    {JSON.stringify(session, null, 2)}
                   </pre>
                 </div>
               )}
@@ -299,20 +360,20 @@ export default function TestPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {Object.entries(testResults).map(([key, result]: [string, any]) => {
             if (key === 'timestamp') return null;
-            
+
             return (
               <Card key={key} className={`p-6 ${getStatusBg(result.status)}`}>
                 <div className="flex items-center gap-3 mb-3">
                   {getStatusIcon(result.status)}
                   <h3 className="font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1')}</h3>
                 </div>
-                
+
                 <p className="text-sm text-gray-700 mb-3">{result.message}</p>
-                
+
                 {result.data && (
                   <div className="bg-white bg-opacity-50 rounded p-3">
                     <pre className="text-xs text-gray-800 overflow-x-auto">
-                      {typeof result.data === 'object' 
+                      {typeof result.data === 'object'
                         ? JSON.stringify(result.data, null, 2)
                         : result.data
                       }
@@ -330,22 +391,22 @@ export default function TestPage() {
             <Globe className="w-6 h-6 text-blue-600" />
             <h2 className="text-xl font-semibold">Tests de Navegación</h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button 
+            <Button
               onClick={() => window.location.href = '/dashboard/student'}
               className="w-full"
             >
               Dashboard Estudiante
             </Button>
-            <Button 
+            <Button
               onClick={() => window.location.href = '/admin'}
               variant="outline"
               className="w-full"
             >
               Panel Admin
             </Button>
-            <Button 
+            <Button
               onClick={() => window.location.href = '/auth/login'}
               variant="outline"
               className="w-full"
