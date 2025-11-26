@@ -264,31 +264,7 @@ export default function ProfilePage() {
 
           {/* Sidebar de seguridad */}
           <div className="space-y-6">
-            {/* Seguridad */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Seguridad</h3>
-
-              <Button
-                variant="outline"
-                className="w-full mb-4"
-                onClick={() => {
-                  // Aquí podrías implementar cambio de contraseña
-                  alert('Funcionalidad de cambio de contraseña próximamente');
-                }}
-              >
-                <Lock className="w-4 h-4 mr-2" />
-                Cambiar contraseña
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                onClick={handleSignOut}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Cerrar sesión
-              </Button>
-            </Card>
+           
 
             {/* Estadísticas */}
             <Card className="p-6">
