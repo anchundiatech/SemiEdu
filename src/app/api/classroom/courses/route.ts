@@ -3,6 +3,8 @@ import { getCoursesWithRoles, setAccessToken } from "@/lib/google-classroom";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -30,10 +32,10 @@ export async function GET() {
 
     const courses = await getCoursesWithRoles(userEmail);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       courses,
       total: courses.length,
-      userRole: session.user.role 
+      userRole: session.user.role
     });
   } catch (error: unknown) {
     console.error("/api/classroom/courses error:", error);
