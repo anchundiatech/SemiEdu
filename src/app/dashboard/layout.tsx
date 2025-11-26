@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import AuthGuard from '@/components/auth/AuthGuard';
+
 import {
   LayoutDashboard,
   Users,
@@ -139,7 +139,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <AuthGuard>
+   
       <div className="min-h-screen bg-gray-50">
       {/* Sidebar móvil - solo mostrar si shouldShowSidebar es true */}
       {shouldShowSidebar && (
@@ -282,6 +282,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </main>
       </div>
     </div>
-    </AuthGuard>
+   
   );
 }
