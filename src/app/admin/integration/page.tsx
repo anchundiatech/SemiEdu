@@ -44,6 +44,8 @@ interface SyncResult {
   students: number;
   assignments: number;
   errors: any[];
+
+
 }
 
 export default function GoogleClassroomIntegration() {
@@ -642,5 +644,6 @@ export default function GoogleClassroomIntegration() {
         </Card>
       )}
     </div>
+    
   );
 }
