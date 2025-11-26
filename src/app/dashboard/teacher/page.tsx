@@ -1,6 +1,8 @@
 'use client';
+export const dynamic = "force-dynamic";
 
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
@@ -21,7 +23,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useGoogleClassroomData } from '@/hooks/useGoogleClassroomData';
 import { useNotifications } from '@/contexts/NotificationContext';
 
-export default function TeacherDashboardPage() {
+function TeacherDashboardContent() {
   const [selectedTeacher, setSelectedTeacher] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<string>('6months');
   const { data: session, status } = useSession();
@@ -552,5 +554,21 @@ export default function TeacherDashboardPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center">
+      <div className="text-gray-600">Cargando dashboard...</div>
+    </div>
+  );
+}
+
+export default function TeacherDashboardPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <TeacherDashboardContent />
+    </Suspense>
   );
 }
