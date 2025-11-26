@@ -3,6 +3,8 @@ import { getCourseWork, setAccessToken } from "@/lib/google-classroom";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -32,9 +34,9 @@ export async function GET(request: Request) {
 
     const courseWork = await getCourseWork(courseId);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       courseWork,
-      total: courseWork.length 
+      total: courseWork.length
     });
   } catch (error: unknown) {
     console.error("/api/classroom/coursework error:", error);
