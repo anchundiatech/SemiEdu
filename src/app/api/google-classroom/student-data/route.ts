@@ -3,6 +3,8 @@ import { getStudents, setAccessToken } from "@/lib/google-classroom";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -32,7 +34,7 @@ export async function GET(request: Request) {
 
     const students = await getStudents(courseId);
 
-      return NextResponse.json({
+    return NextResponse.json({
       students,
       total: students.length
     });
