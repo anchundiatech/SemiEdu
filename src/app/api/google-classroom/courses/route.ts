@@ -17,45 +17,55 @@ export async function GET(request: Request) {
       );
     }
 
-    // Determinar si el usuario es estudiante o docente
-    const userRole = session.user?.role || 'estudiante';
+    // Determina si es estudiante o docente
+    const userRole = session.user?.role || "estudiante";
+
     let coursesResponse;
-
-    if (userRole === 'estudiante') {
-      coursesResponse = await fetch('https://classroom.googleapis.com/v1/courses?studentId=me',{
-        headers:{
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+    if (userRole === "estudiante") {
+      coursesResponse = await fetch(
+        "https://classroom.googleapis.com/v1/courses?studentId=me",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
-
+      );
     } else {
-      coursesResponse = await fetch('https://classroom.googleapis.com/v1/courses?teacherId=me',{
-        headers:{
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+      coursesResponse = await fetch(
+        "https://classroom.googleapis.com/v1/courses?teacherId=me",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
     }
 
-
-    if(!coursesResponse.ok){
+    if (!coursesResponse.ok) {
       const errorText = await coursesResponse.text();
-      console.error('Google Classroom API error: ', coursesResponse.status,)
+      console.error("Google Classroom Courses Error:", errorText);
+
+      return NextResponse.json(
+        {
+          error: "Failed to fetch courses from Google Classroom",
+          details: errorText,
+        },
+        { status: 500 }
+      );
     }
 
+    // ✅ Aquí si definimos courses
+    const coursesData = await coursesResponse.json();
+    const courses = coursesData.courses || [];
 
-
- 
-    
-    
-
-    console.log('Google Classroom API response:', {
+    console.log("Google Classroom API response:", {
       coursesCount: courses.length,
-      courses: courses.map((c: any) => ({ id: c.id, name: c.name, courseState: c.courseState }))
+      sample: courses.slice(0, 3),
     });
 
-    // Obtener tareas para cada curso
+    // Obtener tareas
     const coursesWithAssignments = await Promise.all(
       courses.map(async (course: any) => {
         try {
@@ -63,66 +73,82 @@ export async function GET(request: Request) {
             `https://classroom.googleapis.com/v1/courses/${course.id}/courseWork`,
             {
               headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
               },
             }
           );
 
           let assignments = [];
           if (assignmentsResponse.ok) {
-            const assignmentsData = await assignmentsResponse.json();
-            assignments = assignmentsData.courseWork || [];
+            const data = await assignmentsResponse.json();
+            assignments = data.courseWork || [];
           }
 
           return {
             ...course,
-            assignments: assignments.map((assignment: any) => ({
-              id: assignment.id,
-              title: assignment.title,
-              description: assignment.description,
-              state: assignment.state,
-              dueDate: assignment.dueDate,
-              dueTime: assignment.dueTime,
-              maxPoints: assignment.maxPoints,
-              workType: assignment.workType,
-              alternateLink: assignment.alternateLink,
-              courseName: course.name
-            }))
+            assignments: assignments.map((a: any) => ({
+              id: a.id,
+              title: a.title,
+              description: a.description,
+              state: a.state,
+              dueDate: a.dueDate,
+              dueTime: a.dueTime,
+              maxPoints: a.maxPoints,
+              workType: a.workType,
+              alternateLink: a.alternateLink,
+              courseName: course.name,
+            })),
           };
         } catch (error) {
-          console.error(`Error fetching assignments for course ${course.id}:`, error);
+          console.error(
+            `Error fetching assignments for course ${course.id}:`,
+            error
+          );
           return {
             ...course,
-            assignments: []
+            assignments: [],
           };
         }
       })
     );
 
-    // Calcular estadísticas
-    const allAssignments = coursesWithAssignments.flatMap(course => course.assignments);
-    const pendingAssignments = allAssignments.filter(assignment =>
-      assignment.state === 'PUBLISHED' &&
-      assignment.dueDate &&
-      new Date(assignment.dueDate.year, assignment.dueDate.month - 1, assignment.dueDate.day) > new Date()
-    );
-    const completedAssignments = allAssignments.filter(assignment =>
-      assignment.state === 'TURNED_IN' || assignment.state === 'RETURNED'
+    // Estadísticas
+    const allAssignments = coursesWithAssignments.flatMap(
+      (course) => course.assignments
     );
 
-    const totalAssignmentsCount = allAssignments?.length || 0;
-    const completedAssignmentsCount = completedAssignments?.length || 0;
-    const pendingAssignmentsCount = pendingAssignments?.length || 0;
+    const pendingAssignments = allAssignments.filter((assignment) => {
+      if (
+        assignment.state === "PUBLISHED" &&
+        assignment.dueDate &&
+        typeof assignment.dueDate.year === "number"
+      ) {
+        const due = new Date(
+          assignment.dueDate.year,
+          assignment.dueDate.month - 1,
+          assignment.dueDate.day
+        );
+        return due > new Date();
+      }
+      return false;
+    });
+
+    const completedAssignments = allAssignments.filter((assignment) =>
+      ["TURNED_IN", "RETURNED"].includes(assignment.state)
+    );
 
     const statistics = {
-      totalCourses: coursesResponse?.length || 0,
-      totalAssignments: totalAssignmentsCount,
-      pendingAssignments: pendingAssignmentsCount,
-      completedAssignments: completedAssignmentsCount,
+      totalCourses: courses.length,
+      totalAssignments: allAssignments.length,
+      pendingAssignments: pendingAssignments.length,
+      completedAssignments: completedAssignments.length,
       lateSubmissions: 0,
       averageGrade: null,
-      submissionRate: totalAssignmentsCount > 0 ? completedAssignmentsCount / totalAssignmentsCount : 0
+      submissionRate:
+        allAssignments.length > 0
+          ? completedAssignments.length / allAssignments.length
+          : 0,
     };
 
     return NextResponse.json({
@@ -134,17 +160,16 @@ export async function GET(request: Request) {
         userProfile: {
           id: session.user?.id,
           name: session.user?.name,
-          email: session.user?.email
-        }
-      }
+          email: session.user?.email,
+        },
+      },
     });
-
-  } catch (error: unknown) {
+  } catch (error: any) {
     console.error("/api/google-classroom/courses error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Internal server error"
+        error: error.message || "Internal server error",
       },
       { status: 500 }
     );
