@@ -17,35 +17,38 @@ export async function GET(request: Request) {
       );
     }
 
-    // Para estudiantes, usamos el endpoint con studentId=me para obtener cursos donde es estudiante
-    const response = await fetch('https://classroom.googleapis.com/v1/courses?studentId=me', {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    // Determinar si el usuario es estudiante o docente
+    const userRole = session.user?.role || 'estudiante';
+    let coursesResponse;
 
-
-    // Obtener cursos del usuario desde Google Classroom API
-    // Para docentes, usamos el endpoint con teacherId=me para obtener cursos donde es profesor
-    const responseTeacher = await fetch(
-      'https://classroom.googleapis.com/v1/courses?teacherId=me',
-      {
-        headers: {
+    if (userRole === 'estudiante') {
+      coursesResponse = await fetch('https://classroom.googleapis.com/v1/courses?studentId=me',{
+        headers:{
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
-        },
-      }
-    );
+        }
+      });
 
-    if (!responseTeacher.ok) {
-      const errorText = await response.text();
-      console.error('Google Classroom API error:', response.status, errorText);
-      throw new Error(`Google Classroom API error: ${response.status} - ${errorText}`);
+    } else {
+      coursesResponse = await fetch('https://classroom.googleapis.com/v1/courses?teacherId=me',{
+        headers:{
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        }
+      });
     }
 
-    const data = await response.json();
-    const courses = data.courses || [];
+
+    if(!coursesResponse.ok){
+      const errorText = await coursesResponse.text();
+      console.error('Google Classroom API error: ', coursesResponse.status,)
+    }
+
+
+
+ 
+    
+    
 
     console.log('Google Classroom API response:', {
       coursesCount: courses.length,
@@ -113,7 +116,7 @@ export async function GET(request: Request) {
     const pendingAssignmentsCount = pendingAssignments?.length || 0;
 
     const statistics = {
-      totalCourses: courses?.length || 0,
+      totalCourses: coursesResponse?.length || 0,
       totalAssignments: totalAssignmentsCount,
       pendingAssignments: pendingAssignmentsCount,
       completedAssignments: completedAssignmentsCount,
