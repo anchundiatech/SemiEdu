@@ -36,12 +36,12 @@ export const authOptions: NextAuthOptions = {
       account?: Account | null;
       profile?: { email?: string | null } | null;
     }) {
-      // Persist the OAuth access_token and or the user id to the token right after signin
+     
       if (account) {
         token.accessToken = account.access_token;
       }
 
-      // Add user role based on email domain or specific logic
+      // añadir redireccionamiento basado en el rol
       if (profile?.email) {
         token.email = profile.email;
         token.role = determineUserRole(profile.email);
@@ -50,7 +50,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }) {
-      // Send properties to the client
+      
       if (token) {
         session.accessToken = token.accessToken as string;
         session.user.email = token.email as string;
@@ -69,20 +69,70 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-// Function to determine user role based on email
+// Funcion para determinar el rol del usuario
 function determineUserRole(
   email: string
 ): "estudiante" | "docente" | "coordinador" {
-  // Customize this logic based on your requirements
-  // You might want to check against a database or use specific email patterns
+  const emailLower = email.toLowerCase();
 
-  // Example logic:
-  if (email.includes("profesor") || email.includes("teacher") || email.includes("docente")) {
-    return "docente";
-  }
-  if (email.includes("coordinador") || email.includes("admin") || email.includes("director")) {
+  // Lista de palabras clave para cada rol
+  const coordinadorKeywords = [
+    "coordinador", "coordinadora", "coordinacion",
+    "admin", "administrador", "administradora", "administracion",
+    "director", "directora", "direccion",
+    "supervisor", "supervisora", "supervision",
+    "manager", "management", "gerente",
+    "jefe", "jefa", "jefatura",
+    "lider", "liderazgo", "liderazgo",
+    "responsable", "responsabilidad",
+    "head", "chief", "principal",
+    "coordinador@", "admin@", "director@", "supervisor@"
+  ];
+
+  const docenteKeywords = [
+    "profesor", "profesora", "profesores",
+    "teacher", "teachers", "teaching",
+    "docente", "docentes", "docencia",
+    "instructor", "instructora", "instructores",
+    "educador", "educadora", "educadores",
+    "maestro", "maestra", "maestros",
+    "tutor", "tutora", "tutores",
+    "faculty", "staff", "personal",
+    "prof@", "teacher@", "docente@", "instructor@"
+  ];
+
+  // Verificar si es coordinador
+  const isCoordinador = coordinadorKeywords.some(keyword =>
+    emailLower.includes(keyword)
+  );
+
+  // Verificar si es docente
+  const isDocente = docenteKeywords.some(keyword =>
+    emailLower.includes(keyword)
+  );
+
+  // Priorizar coordinador sobre docente
+  if (isCoordinador) {
     return "coordinador";
   }
+
+  if (isDocente) {
+    return "docente";
+  }
+
+  // Verificar dominios específicos 
+  const domain = emailLower.split('@')[1];
+  if (domain) {
+    // Si el dominio contiene palabras clave
+    if (coordinadorKeywords.some(keyword => domain.includes(keyword))) {
+      return "coordinador";
+    }
+    if (docenteKeywords.some(keyword => domain.includes(keyword))) {
+      return "docente";
+    }
+  }
+
+  
 
   // Default to student
   return "estudiante";
