@@ -209,14 +209,39 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-4">
+     <footer className="bg-gray-900 text-white py-6">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div className="text-gray-200 font-semibold">SemiEdu</div>
+    <div className="flex items-center gap-6 text-gray-300 text-sm">
+      <a
+        href="/privacy"
+        className="hover:text-white underline underline-offset-4"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Política de Privacidad
+      </a>
+     <a
+     href='/terms'
+     className='hover:text-white underline underline-offset-4'
+     target='_blank'
+     rel="nooper noreferrer"
+     >
+      Terminos y Condiciones
+     </a>
+      <a
+        href="mailto:armandoanchundiayela@gmail.com"
+        className="hover:text-white"
+      >
+        Contacto
+      </a>
+    </div>
+  </div>
+  <div className="border-t border-gray-800 mt-6 pt-4 text-center text-gray-400 text-sm">
+    <p>&copy; 2024 SemiEdu. Todos los derechos reservados.</p>
+  </div>
+</footer>
 
-
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 SemiEdu. Todos los derechos reservados.</p>
-          </div>
-
-      </footer>
     </div>
   );
 }
