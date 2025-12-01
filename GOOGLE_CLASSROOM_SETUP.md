@@ -35,11 +35,6 @@ El sistema está mostrando "Clase de Prueba para API" en lugar de los cursos rea
 Crea un archivo `.env.local` en la raíz del proyecto con:
 
 ```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=tu_supabase_url_aqui
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key_aqui
-SUPABASE_SERVICE_ROLE_KEY=tu_supabase_service_role_key_aqui
-
 # Google OAuth Configuration
 GOOGLE_CLIENT_ID=tu_google_client_id_aqui
 GOOGLE_CLIENT_SECRET=tu_google_client_secret_aqui
